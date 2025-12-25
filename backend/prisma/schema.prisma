@@ -1,0 +1,474 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+// ============================================
+// =============   Address   ==================
+// ============================================
+
+
+// ------------------ COUNTRY ------------------
+model Country {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+
+  states State[]
+}
+
+// ------------------ STATE ------------------
+model State {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  countryId Int
+
+  country   Country  @relation(fields: [countryId], references: [id])
+  cities    City[]
+}
+
+// ------------------ CITY ------------------
+model City {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  stateId Int
+
+  state    State   @relation(fields: [stateId], references: [id])
+  address  Address[]
+}
+
+// ------------------ ADDRESS ------------------
+model Address {
+  id         Int     @id @default(autoincrement())
+  location   String
+  postalcode Int
+  latitude   Float
+  longitude  Float
+  cityId     Int
+
+  city       City    @relation(fields: [cityId], references: [id])
+
+  venues Venue[]
+}
+
+
+// =================== ENUMS =====================
+enum VenueStatus {
+  ACTIVE
+  UNDER_MAINTENANCE
+  PENDING
+  BLOCKED
+  DELETED
+}
+
+enum PriceUnit {
+  HOURLY
+  DAILY
+}
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+// ============================================
+// =============   Venue   ==================
+// ============================================
+
+// ----------------------- VENUE -----------------------
+model Venue {
+  id             Int        @id @default(autoincrement())
+  venuename      String
+  description    String
+  capacity       Int
+  contactemail   String
+  contactnumber1 String
+  contactnumber2 String?
+  status         VenueStatus @default(PENDING)
+
+  hostId Int
+  host HostMaster @relation(fields: [hostId] , references: [id])
+
+  addressId Int
+  address   Address @relation(fields: [addressId], references: [id])
+
+  features VenueFeature[]
+  types    VenueType[]
+  photos   VenuePhoto[]
+  reviews  Review[]
+  stats    VenueStatistic[]
+  pricing  VenuePricingRule[]
+  bookings Booking[]
+  wishes   Wishlist[]
+}
+
+// ----------------------- FEATURE -----------------------
+model Feature {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  icon  String
+
+  venues VenueFeature[]
+}
+
+// Many-to-Many bridge
+model VenueFeature {
+  id        Int     @id @default(autoincrement())
+  venueId   Int
+  featureId Int
+
+  venue   Venue   @relation(fields: [venueId], references: [id])
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@unique([venueId, featureId])
+}
+
+// ----------------------- VENUE TYPE -----------------------
+model TypeOfVenue {
+  id   Int    @id @default(autoincrement())
+  name String
+  icon String
+
+  venues VenueType[]
+}
+
+// Many-to-Many bridge
+model VenueType {
+  id         Int @id @default(autoincrement())
+  venueId    Int
+  typeId     Int
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  type  TypeOfVenue @relation(fields: [typeId], references: [id])
+
+  @@unique([venueId, typeId])
+}
+
+// ----------------------- PHOTOS -----------------------
+model VenuePhoto {
+  id        Int    @id @default(autoincrement())
+  image     String
+  description String?
+  order     Int 
+
+  venueId Int
+  venue   Venue @relation(fields: [venueId], references: [id])
+}
+
+// ----------------------- REVIEWS -----------------------
+model Review {
+  id      Int    @id @default(autoincrement())
+  rating  Int
+  comment String?
+
+  venueId Int
+  userId  Int
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------- STATISTICS -----------------------
+model VenueStatistic {
+  id               Int      @id @default(autoincrement())
+  statDate         DateTime @default(now())
+  pageViews        Int?
+  bookingrequests  Int?
+  confirmedbookings Int?
+  revenue          Float?
+
+  venueId Int
+  venue   Venue @relation(fields: [venueId], references: [id])
+}
+
+// ----------------------- PRICING RULES -----------------------
+model VenuePricingRule {
+  id       Int      @id @default(autoincrement())
+  venueId  Int
+  unit     PriceUnit
+  price    Float
+  startTime DateTime?
+  endTime   DateTime?
+
+  venue   Venue @relation(fields: [venueId], references: [id])
+}
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+// ============================================
+// =============   Service   ==================
+// ============================================
+
+
+
+// ----------------------- SERVICE PROVIDER -----------------------
+model ServiceProvider {
+  id        Int     @id @default(autoincrement())
+  name      String
+  contact   String?
+  email     String?
+  userId    Int?
+
+  user User? @relation(fields: [userId], references: [id])
+
+  services Service[]
+}
+
+// ================= SERVICE CATEGORY =================
+model ServiceCategory {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  services Service[]
+}
+
+// ================= SERVICE =================
+model Service {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String?
+  basePrice   Float
+
+  categoryId Int?
+  providerId Int
+
+  category ServiceCategory? @relation(fields: [categoryId], references: [id])
+  provider ServiceProvider   @relation(fields: [providerId], references: [id])
+
+  bookings BookingService[]
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+// ============================================
+// =============   Bookings   ==================
+// ============================================
+
+// ----------------------- BOOKING STATUS ENUM -----------------------
+enum BookingStatus {
+  CART
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REFUNDED
+}
+
+// ----------------------- PAYMENT ENUMS -----------------------
+enum PaymentMethod {
+  UPI
+  CREDIT_CARD
+  CASH
+  BANK_CHEQUE
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  FAILED
+  CANCELLED
+}
+
+// ----------------------- BOOKING -----------------------
+model Booking {
+  id        Int    @id @default(autoincrement())
+
+  userId    Int
+  venueId   Int
+
+  bookingStatus BookingStatus @default(PENDING_PAYMENT)
+
+  startTime DateTime
+  endTime   DateTime
+  numberOfGuestsExpected Int?
+  totalCost Float
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  services BookingService[]
+  payment  Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------- BOOKING SERVICES (Many-to-Many) -----------------------
+model BookingService {
+  id        Int   @id @default(autoincrement())
+
+  bookingId Int
+  serviceId Int
+
+  priceAtBooking Float
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@unique([bookingId, serviceId])
+}
+
+// ----------------------- PAYMENT -----------------------
+model Payment {
+  id            Int    @id @default(autoincrement())
+  bookingId     Int    @unique
+  transactionId String @unique
+  amount        Float
+
+  paymentMethod PaymentMethod @default(CREDIT_CARD)
+  status        PaymentStatus  @default(PENDING)
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+// ============================================
+// =============   RBAC & other ...   ==================
+// ============================================
+
+
+
+// ----------------------- USER -----------------------
+model User {
+  id            Int        @id @default(autoincrement())
+  username      String     @unique
+  fullname      String?
+  contactnumber String     @unique
+  password      String
+  salt          String?
+  email         String?    @unique
+
+  roles         UserRole[]
+  wishlists     Wishlist[]
+  logs          ActionLog[]
+  hostmaster    HostMaster?
+  servs         ServiceProvider[]
+  reviews       Review[]
+  bookings      Booking[]
+}
+
+// ----------------------- ROLE -----------------------
+model Role {
+  id        Int          @id @default(autoincrement())
+  rolename  String       @unique
+  users     UserRole[]
+  perms     RolePermission[]
+}
+
+// ----------------------- USER ROLE  -----------------------
+model UserRole {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  roleId    Int
+  isDeleted Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+}
+
+// ----------------------- APP TABLE -----------------------
+model AppTable {
+  id          Int             @id @default(autoincrement())
+  tablename   String          @unique
+  displayname String          @unique
+
+  menuLinks   MenuLink[]
+  perms       RolePermission[]
+  logs        ActionLog[]
+}
+
+// ----------------------- OPERATION -----------------------
+model Operation {
+  id            Int             @id @default(autoincrement())
+  operationname String          @unique
+
+  perms         RolePermission[]
+  logs          ActionLog[]
+}
+
+// ----------------------- ROLE PERMISSION -----------------------
+model RolePermission {
+  id         Int    @id @default(autoincrement())
+  roleId     Int
+  tableId    Int
+  operationId Int
+  isDeleted  Boolean @default(false)
+
+  role      Role      @relation(fields: [roleId], references: [id])
+  table     AppTable  @relation(fields: [tableId], references: [id])
+  operation Operation @relation(fields: [operationId], references: [id])
+
+  @@unique([roleId, tableId, operationId])
+}
+
+// ----------------------- ACTION LOG -----------------------
+model ActionLog {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  tableId          Int
+  operationId      Int
+  operationObjectID Int
+  operationDate    DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  table     AppTable  @relation(fields: [tableId], references: [id])
+  operation Operation @relation(fields: [operationId], references: [id])
+}
+
+// ----------------------- MENU LINK (Self Relation) -----------------------
+model MenuLink {
+  id          Int       @id @default(autoincrement())
+  displayname String    @unique
+  url         String
+  icon        String?
+  tableId     Int
+
+  parentId Int?
+  parent   MenuLink?   @relation("MenuParent", fields: [parentId], references: [id])
+  children MenuLink[]  @relation("MenuParent")
+
+  table AppTable @relation(fields: [tableId], references: [id])
+}
+
+// ----------------------- WISHLIST -----------------------
+model Wishlist {
+  id      Int @id @default(autoincrement())
+  userId  Int
+  venueId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
+
+  @@unique([userId, venueId])
+}
+
+// ----------------------- HOST MASTER -----------------------
+model HostMaster {
+  id       Int    @id @default(autoincrement())
+  userId   Int    @unique
+  fullname String
+  contact1 String
+  contact2 String?
+  pannumber String
+  idProof  String?
+  photo    String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  venues Venue[]
+}
