@@ -344,11 +344,9 @@ model Payment {
 // ----------------------- USER -----------------------
 model User {
   id            Int        @id @default(autoincrement())
-  username      String     @unique
-  fullname      String?
   contactnumber String     @unique
-  password      String
-  salt          String?
+  fullname      String?
+  username      String?     @unique
   email         String?    @unique
 
   roles         UserRole[]
