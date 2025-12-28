@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 export const checkForAuthenticationCookie = (cookieName) => {
   return (req, res, next) => {
-    const token = req.cookies[cookieName];
+    const token = req.cookies?.[cookieName];
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);

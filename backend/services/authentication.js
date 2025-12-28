@@ -2,8 +2,10 @@ import jwt from 'jsonwebtoken';
 
 export function createTokenForUser(user) {
     const payload = {
-        _id: user._id,
-        username: user.username,
+        id: user.id,
+        contactnumber: user.contactnumber,
+        fullname: user.fullname,
+        email: user.email
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: '1d',
