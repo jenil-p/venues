@@ -7,9 +7,7 @@ dotenv.config();
 
 //importing routes ...
 import authRoutes from './routes/auth.route.js';
-// import roleRoutes from './routes/role.route.js';
-// import operationRoutes from './routes/operation.route.js';
-// import apptableRoutes from './routes/apptable.route.js';
+import roleRoutes from './routes/adminRoutes/role.route.js'
 
 const app = express();
 const PORT = process.env.PORT;
@@ -28,12 +26,7 @@ app.use(
 );
 
 app.use('/auth' , authRoutes);
-
-
-// app.use('/role' , roleRoutes);
-// app.use('/op' , operationRoutes);
-// app.use('/aptble' , apptableRoutes);
-
+app.use('/role' , roleRoutes);
 
 app.get('/', (req, res) => {
     res.send('this is a venue finding and booking application...');
