@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+ // this middleware sets the user in request's body by parsing the token 
 export const checkForAuthenticationCookie = (cookieName) => {
   return (req, res, next) => {
     const token = req.cookies?.[cookieName];

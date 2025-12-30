@@ -9,6 +9,8 @@ dotenv.config();
 import authRoutes from './routes/auth.route.js';
 import roleRoutes from './routes/adminRoutes/role.route.js'
 
+import assignRoutes from './routes/adminRoutes/userrole.route.js';
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -27,6 +29,8 @@ app.use(
 
 app.use('/auth' , authRoutes);
 app.use('/role' , roleRoutes);
+
+app.use('/admin' , assignRoutes);
 
 app.get('/', (req, res) => {
     res.send('this is a venue finding and booking application...');
