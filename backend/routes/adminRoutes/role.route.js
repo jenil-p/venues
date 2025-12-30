@@ -28,4 +28,26 @@ router.post('/add-role' , async(req , res)=>{
     }
 })
 
+router.delete('/delete-role' , async(req , res)=>{
+    const { rolename } = req.body;
+
+    const isRole = await prisma.role.findUnique({
+        where : {
+            rolename : rolename,
+        }
+    })
+
+    if(!isRole){
+        return res.status(404).json({message : "could not found this role..."});
+    }
+
+    const deleteRole = await prisma.role.delete({
+        where : {
+            rolename : rolename,
+        }
+    })
+
+    return res.status(200).json({message : "role deleted successfully ..." , deleteRole})
+})
+
 export default router;
