@@ -86,14 +86,29 @@ export async function createUser(req, res) {
     if (findUser) {
         return res.status(409).json({ message: "user exists with this phone number ..." });
     }
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
         data: {
             contactnumber: contactnumber,
             fullname: fullname,
             email: email,
         }
     })
-    return res.status(200).json({ message: 'user created successfully !' });
+
+    const findRoleAsUser = await prisma.role.findUnique({
+        where : {
+            rolename : 'user',
+        }
+    })
+
+    await prisma.userRole.create({
+        data : {
+            userId : newUser.id,
+            roleId : findRoleAsUser.id,
+            isDeleted : false,
+        }
+    })
+
+    return res.status(200).json({ message: 'user created successfully ! and assigned as simple user ...' });
 };
 
 export async function deleteUser(req, res) {
