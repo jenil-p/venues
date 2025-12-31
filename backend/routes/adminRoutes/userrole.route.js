@@ -1,7 +1,7 @@
 import express from 'express'
 
 import { checkForAuthenticationCookie } from '../../middlewares/authentication.middleware.js'
-import { assignRoleToUser , deAssignRoleFromUser } from '../../controllers/userrole.controller.js';
+import { assignRoleToUser , deAssignRoleFromUser } from '../../controllers/adminControllers/userrole.controller.js';
 import { isAdmin } from '../../middlewares/authorization.middleware.js';
 
 const router = express.Router();
