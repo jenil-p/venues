@@ -63,6 +63,14 @@ export async function verifyOtp(req, res) {
             });
 
         if (verificationCheck.status === "approved") {
+            await prisma.user.update({
+                where : {
+                    contactnumber : contactnumber
+                },
+                data : {
+                    isverified : true
+                },
+            })
             const token = createTokenForUser(user);
             res.cookie('token', token, { httpOnly: true });
             return res.json({ success: true, message: "OTP verified", token: token });
