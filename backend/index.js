@@ -7,9 +7,13 @@ dotenv.config();
 
 //importing routes ...
 import authRoutes from './routes/auth.route.js';
-import roleRoutes from './routes/adminRoutes/role.route.js'
+import roleRoutes from './routes/adminRoutes/role.route.js';
 
 import assignRoutes from './routes/adminRoutes/userrole.route.js';
+
+import apptableRoutes from './routes/rbacRoutes/apptable.routes.js';
+import permissionRoutes from './routes/rbacRoutes/permission.routes.js';
+import operationRoutes from './routes/rbacRoutes/operation.routes.js';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -27,10 +31,17 @@ app.use(
     })
 );
 
+// general
 app.use('/auth' , authRoutes);
-app.use('/role' , roleRoutes);
+app.use('/admin/role' , roleRoutes);
 
-app.use('/admin' , assignRoutes);
+// admin functionalities
+app.use('/admin/userrole' , assignRoutes);
+
+// RBAC (admin)
+app.use('/table' , apptableRoutes);
+app.use('/operation', operationRoutes);
+app.use('/permission' , permissionRoutes);
 
 app.get('/', (req, res) => {
     res.send('this is a venue finding and booking application...');

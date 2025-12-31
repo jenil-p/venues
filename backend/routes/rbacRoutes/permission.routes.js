@@ -1,7 +1,7 @@
 import express from "express";
-import { assignPermission } from "../controllers/permission.controller.js";
-import { checkForAuthenticationCookie } from "../middlewares/authentication.middleware.js";
-import { isAdmin } from "../middlewares/authorization.middleware.js";
+import { assignPermission } from "../../controllers/rbacControllers/permission.controller.js";
+import { checkForAuthenticationCookie } from "../../middlewares/authentication.middleware.js";
+import { isAdmin } from "../../middlewares/authorization.middleware.js";
 
 const router = express.Router();
 
