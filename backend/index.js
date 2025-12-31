@@ -39,9 +39,9 @@ app.use('/admin/role' , roleRoutes);
 app.use('/admin/userrole' , assignRoutes);
 
 // RBAC (admin)
-app.use('/table' , apptableRoutes);
-app.use('/operation', operationRoutes);
-app.use('/permission' , permissionRoutes);
+app.use('/admin/table' , apptableRoutes);
+app.use('/admin/operation', operationRoutes);
+app.use('/admin/permission' , permissionRoutes);
 
 app.get('/', (req, res) => {
     res.send('this is a venue finding and booking application...');
