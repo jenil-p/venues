@@ -11,49 +11,47 @@ datasource db {
 // =============   Address   ==================
 // ============================================
 
-
 // ------------------ COUNTRY ------------------
 model Country {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
   states State[]
 }
 
 // ------------------ STATE ------------------
 model State {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int    @id @default(autoincrement())
+  name      String @unique
   countryId Int
 
-  country   Country  @relation(fields: [countryId], references: [id])
-  cities    City[]
+  country Country @relation(fields: [countryId], references: [id])
+  cities  City[]
 }
 
 // ------------------ CITY ------------------
 model City {
-  id      Int     @id @default(autoincrement())
-  name    String  @unique
+  id      Int    @id @default(autoincrement())
+  name    String @unique
   stateId Int
 
-  state    State   @relation(fields: [stateId], references: [id])
-  address  Address[]
+  state   State     @relation(fields: [stateId], references: [id])
+  address Address[]
 }
 
 // ------------------ ADDRESS ------------------
 model Address {
-  id         Int     @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   location   String
   postalcode Int
   latitude   Float
   longitude  Float
   cityId     Int
 
-  city       City    @relation(fields: [cityId], references: [id])
+  city City @relation(fields: [cityId], references: [id])
 
   venues Venue[]
 }
-
 
 // =================== ENUMS =====================
 enum VenueStatus {
@@ -69,7 +67,6 @@ enum PriceUnit {
   DAILY
 }
 
-
 //-----------------------------------------------------------------------------------------------------------------------------
 
 // ============================================
@@ -78,7 +75,7 @@ enum PriceUnit {
 
 // ----------------------- VENUE -----------------------
 model Venue {
-  id             Int        @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   venuename      String
   description    String
   capacity       Int
@@ -88,7 +85,7 @@ model Venue {
   status         VenueStatus @default(PENDING)
 
   hostId Int
-  host HostMaster @relation(fields: [hostId] , references: [id])
+  host   HostMaster @relation(fields: [hostId], references: [id])
 
   addressId Int
   address   Address @relation(fields: [addressId], references: [id])
@@ -96,7 +93,7 @@ model Venue {
   features VenueFeature[]
   types    VenueType[]
   photos   VenuePhoto[]
-  reviews  Review[]
+  reviews  VenueReview[]
   stats    VenueStatistic[]
   pricing  VenuePricingRule[]
   bookings Booking[]
@@ -105,16 +102,16 @@ model Venue {
 
 // ----------------------- FEATURE -----------------------
 model Feature {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  icon  String
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  icon String
 
   venues VenueFeature[]
 }
 
 // Many-to-Many bridge
 model VenueFeature {
-  id        Int     @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
   venueId   Int
   featureId Int
 
@@ -135,11 +132,11 @@ model TypeOfVenue {
 
 // Many-to-Many bridge
 model VenueType {
-  id         Int @id @default(autoincrement())
-  venueId    Int
-  typeId     Int
+  id      Int @id @default(autoincrement())
+  venueId Int
+  typeId  Int
 
-  venue Venue @relation(fields: [venueId], references: [id])
+  venue Venue       @relation(fields: [venueId], references: [id])
   type  TypeOfVenue @relation(fields: [typeId], references: [id])
 
   @@unique([venueId, typeId])
@@ -147,18 +144,18 @@ model VenueType {
 
 // ----------------------- PHOTOS -----------------------
 model VenuePhoto {
-  id        Int    @id @default(autoincrement())
-  image     String
+  id          Int     @id @default(autoincrement())
+  image       String
   description String?
-  order     Int 
+  order       Int
 
   venueId Int
   venue   Venue @relation(fields: [venueId], references: [id])
 }
 
 // ----------------------- REVIEWS -----------------------
-model Review {
-  id      Int    @id @default(autoincrement())
+model VenueReview {
+  id      Int     @id @default(autoincrement())
   rating  Int
   comment String?
 
@@ -174,12 +171,12 @@ model Review {
 
 // ----------------------- STATISTICS -----------------------
 model VenueStatistic {
-  id               Int      @id @default(autoincrement())
-  statDate         DateTime @default(now())
-  pageViews        Int?
-  bookingrequests  Int?
+  id                Int      @id @default(autoincrement())
+  statDate          DateTime @default(now())
+  pageViews         Int?
+  bookingrequests   Int?
   confirmedbookings Int?
-  revenue          Float?
+  revenue           Float?
 
   venueId Int
   venue   Venue @relation(fields: [venueId], references: [id])
@@ -187,16 +184,15 @@ model VenueStatistic {
 
 // ----------------------- PRICING RULES -----------------------
 model VenuePricingRule {
-  id       Int      @id @default(autoincrement())
-  venueId  Int
-  unit     PriceUnit
-  price    Float
+  id        Int       @id @default(autoincrement())
+  venueId   Int
+  unit      PriceUnit
+  price     Float
   startTime DateTime?
   endTime   DateTime?
 
-  venue   Venue @relation(fields: [venueId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
 }
-
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -204,15 +200,13 @@ model VenuePricingRule {
 // =============   Service   ==================
 // ============================================
 
-
-
 // ----------------------- SERVICE PROVIDER -----------------------
 model ServiceProvider {
-  id        Int     @id @default(autoincrement())
-  name      String
-  contact   String?
-  email     String?
-  userId    Int?
+  id      Int     @id @default(autoincrement())
+  name    String
+  contact String?
+  email   String?
+  userId  Int?
 
   user User? @relation(fields: [userId], references: [id])
 
@@ -229,7 +223,7 @@ model ServiceCategory {
 
 // ================= SERVICE =================
 model Service {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String?
   basePrice   Float
@@ -238,12 +232,41 @@ model Service {
   providerId Int
 
   category ServiceCategory? @relation(fields: [categoryId], references: [id])
-  provider ServiceProvider   @relation(fields: [providerId], references: [id])
+  provider ServiceProvider  @relation(fields: [providerId], references: [id])
 
-  bookings BookingService[]
+  bookings          BookingService[]
+  serviceReviews    ServiceReview[]
+  serviceStatistics ServiceStatistic[]
 }
 
+model ServiceReview {
+  id      Int     @id @default(autoincrement())
+  rating  Int
+  comment String?
 
+  serviceId Int
+  userId    Int
+
+  service Service @relation(fields: [serviceId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, serviceId])
+}
+
+model ServiceStatistic {
+  id        Int      @id @default(autoincrement())
+  statDate  DateTime @default(now())
+  views     Int?
+  inquiries Int?
+  bookings  Int?
+  revenue   Float?
+
+  serviceId Int
+  service   Service @relation(fields: [serviceId], references: [id])
+}
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -278,17 +301,17 @@ enum PaymentStatus {
 
 // ----------------------- BOOKING -----------------------
 model Booking {
-  id        Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  userId    Int
-  venueId   Int
+  userId  Int
+  venueId Int
 
   bookingStatus BookingStatus @default(PENDING_PAYMENT)
 
-  startTime DateTime
-  endTime   DateTime
+  startTime              DateTime
+  endTime                DateTime
   numberOfGuestsExpected Int?
-  totalCost Float
+  totalCost              Float
 
   venue Venue @relation(fields: [venueId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -302,7 +325,7 @@ model Booking {
 
 // ----------------------- BOOKING SERVICES (Many-to-Many) -----------------------
 model BookingService {
-  id        Int   @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   bookingId Int
   serviceId Int
@@ -323,7 +346,7 @@ model Payment {
   amount        Float
 
   paymentMethod PaymentMethod @default(CREDIT_CARD)
-  status        PaymentStatus  @default(PENDING)
+  status        PaymentStatus @default(PENDING)
 
   booking Booking @relation(fields: [bookingId], references: [id])
 
@@ -331,45 +354,42 @@ model Payment {
   updatedAt DateTime @updatedAt
 }
 
-
-
 //-----------------------------------------------------------------------------------------------------------------------------
 
 // ============================================
 // =============   RBAC & other ...   ==================
 // ============================================
 
-
-
 // ----------------------- USER -----------------------
 model User {
-  id            Int        @id @default(autoincrement())
-  contactnumber String     @unique
+  id            Int     @id @default(autoincrement())
+  contactnumber String  @unique
   fullname      String?
-  username      String?     @unique
-  email         String?    @unique
-  isverified    Boolean     @default(false)
+  username      String? @unique
+  email         String? @unique
+  isverified    Boolean @default(false)
 
-  roles         UserRole[]
-  wishlists     Wishlist[]
-  logs          ActionLog[]
-  hostmaster    HostMaster?
-  servs         ServiceProvider[]
-  reviews       Review[]
-  bookings      Booking[]
+  roles           UserRole[]
+  wishlists       Wishlist[]
+  logs            ActionLog[]
+  hostmaster      HostMaster?
+  servs           ServiceProvider[]
+  venuereviews    VenueReview[]
+  servicesreviews ServiceReview[]
+  bookings        Booking[]
 }
 
 // ----------------------- ROLE -----------------------
 model Role {
-  id        Int          @id @default(autoincrement())
-  rolename  String       @unique
-  users     UserRole[]
-  perms     RolePermission[]
+  id       Int              @id @default(autoincrement())
+  rolename String           @unique
+  users    UserRole[]
+  perms    RolePermission[]
 }
 
 // ----------------------- USER ROLE  -----------------------
 model UserRole {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   userId    Int
   roleId    Int
   isDeleted Boolean @default(false)
@@ -382,31 +402,31 @@ model UserRole {
 
 // ----------------------- APP TABLE -----------------------
 model AppTable {
-  id          Int             @id @default(autoincrement())
-  tablename   String          @unique
-  displayname String          @unique
+  id          Int    @id @default(autoincrement())
+  tablename   String @unique
+  displayname String @unique
 
-  menuLinks   MenuLink[]
-  perms       RolePermission[]
-  logs        ActionLog[]
+  menuLinks MenuLink[]
+  perms     RolePermission[]
+  logs      ActionLog[]
 }
 
 // ----------------------- OPERATION -----------------------
 model Operation {
-  id            Int             @id @default(autoincrement())
-  operationname String          @unique
+  id            Int    @id @default(autoincrement())
+  operationname String @unique
 
-  perms         RolePermission[]
-  logs          ActionLog[]
+  perms RolePermission[]
+  logs  ActionLog[]
 }
 
 // ----------------------- ROLE PERMISSION -----------------------
 model RolePermission {
-  id         Int    @id @default(autoincrement())
-  roleId     Int
-  tableId    Int
+  id          Int     @id @default(autoincrement())
+  roleId      Int
+  tableId     Int
   operationId Int
-  isDeleted  Boolean @default(false)
+  isDeleted   Boolean @default(false)
 
   role      Role      @relation(fields: [roleId], references: [id])
   table     AppTable  @relation(fields: [tableId], references: [id])
@@ -417,12 +437,12 @@ model RolePermission {
 
 // ----------------------- ACTION LOG -----------------------
 model ActionLog {
-  id               Int      @id @default(autoincrement())
-  userId           Int
-  tableId          Int
-  operationId      Int
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  tableId           Int
+  operationId       Int
   operationObjectID Int
-  operationDate    DateTime @default(now())
+  operationDate     DateTime @default(now())
 
   user      User      @relation(fields: [userId], references: [id])
   table     AppTable  @relation(fields: [tableId], references: [id])
@@ -431,15 +451,15 @@ model ActionLog {
 
 // ----------------------- MENU LINK (Self Relation) -----------------------
 model MenuLink {
-  id          Int       @id @default(autoincrement())
-  displayname String    @unique
+  id          Int     @id @default(autoincrement())
+  displayname String  @unique
   url         String
   icon        String?
   tableId     Int
 
   parentId Int?
-  parent   MenuLink?   @relation("MenuParent", fields: [parentId], references: [id])
-  children MenuLink[]  @relation("MenuParent")
+  parent   MenuLink?  @relation("MenuParent", fields: [parentId], references: [id])
+  children MenuLink[] @relation("MenuParent")
 
   table AppTable @relation(fields: [tableId], references: [id])
 }
@@ -458,14 +478,14 @@ model Wishlist {
 
 // ----------------------- HOST MASTER -----------------------
 model HostMaster {
-  id       Int    @id @default(autoincrement())
-  userId   Int    @unique
-  fullname String
-  contact1 String
-  contact2 String?
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  fullname  String
+  contact1  String
+  contact2  String?
   pannumber String
-  idProof  String?
-  photo    String?
+  idProof   String?
+  photo     String?
 
   user User @relation(fields: [userId], references: [id])
 
