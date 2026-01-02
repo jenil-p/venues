@@ -1,6 +1,6 @@
 import prisma from "../../prisma/client.js";
 
-export async function createOperation(req, res) {
+export async function createOperation(req, res , next) {
     try {
         const { operationname } = req.body;
 
@@ -18,7 +18,9 @@ export async function createOperation(req, res) {
             }
         });
 
+        req.objectId = op.id;
         res.json({ message: "Operation added", op });
+        next();
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

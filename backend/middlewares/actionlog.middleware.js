@@ -1,25 +1,41 @@
 import prisma from "../prisma/client.js";
 
 export const logAction = (tableName, operationName, objectIdField) => {
-  return async (req, res, next) => {
-    res.on("finish", async () => {
-      if (res.statusCode < 300) {
-        try {
-          const user = req.user;
+  return (req, res, next) => {
 
-          const table = await prisma.appTable.findUnique({ where: { tablename: tableName } });
-          const op = await prisma.operation.findUnique({ where: { operationname: operationName } });
+    res.on("finish", () => {
+      if (res.statusCode >= 300) return;
+
+      (async () => {
+        try {
+          let objectId = null;
+
+          if (objectIdField && req.params && req.params[objectIdField]) {
+            objectId = Number(req.params[objectIdField]);
+          } else if (req.objectId) {
+            objectId = Number(req.objectId);
+          }
+
+          const table = await prisma.appTable.findUnique({
+            where: { tablename: tableName }
+          });
+
+          const op = await prisma.operation.findUnique({
+            where: { operationname: operationName }
+          });
 
           await prisma.actionLog.create({
             data: {
-              userId: user.id,
+              userId: req.user.id,
               tableId: table.id,
               operationId: op.id,
-              operationObjectID: req.params[objectIdField] || 0
+              operationObjectID: objectId
             }
           });
-        } catch {}
-      }
+        } catch (err) {
+          console.error("action log error : ", err);
+        }
+      })();
     });
 
     next();

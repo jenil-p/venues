@@ -1,6 +1,6 @@
 import prisma from "../../prisma/client.js";
 
-export async function createAppTable(req, res) {
+export async function createAppTable(req, res, next) {
   try {
     const { tablename, displayname } = req.body;
 
@@ -19,7 +19,9 @@ export async function createAppTable(req, res) {
       }
     });
 
+    req.objectId = table.id;
     res.json({ message: "Module added", table });
+    next();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

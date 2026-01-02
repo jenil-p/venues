@@ -119,26 +119,30 @@ export async function createUser(req, res) {
     return res.status(200).json({ message: 'user created successfully ! and assigned as simple user ...' });
 };
 
-export async function deleteUser(req, res) {
-    const { contactnumber } = req.body;
+export async function deleteUser(req, res , next) {
+    const { userId } = req.params;
 
     const findUser = await prisma.user.findUnique({
         where: {
-            contactnumber: contactnumber,
+            id: Number(userId),
         }
     })
 
-    if (!findUser) {
+    if (!findUser || findUser.isDeleted) {
         return res.status(404).json({ message: "User not found ..." });
     }
 
-    const deletedUser = await prisma.user.delete({
+    const deletedUser = await prisma.user.update({
         where: {
-            contactnumber: contactnumber,
+            id: Number(userId),
+        },
+        data : {
+            isDeleted : true
         }
     })
-
-    return res.status(200).json({ message: "user deleted ..." })
+    req.objectId =  userId;
+    res.status(200).json({ message: "user deleted ..." })
+    next();
 }
 
 export async function logOutHelper(req, res) {

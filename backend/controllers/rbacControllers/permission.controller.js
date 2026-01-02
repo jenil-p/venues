@@ -1,6 +1,6 @@
 import prisma from "../../prisma/client.js";
 
-export async function assignPermission(req, res) {
+export async function assignPermission(req, res, next) {
   try {
     const { roleName, tableName, operationName } = req.body;
 
@@ -17,14 +17,13 @@ export async function assignPermission(req, res) {
     const op = await prisma.operation.findUnique({
       where: {
         operationname: operationName
-
       }
     });
 
     if (!role || !table || !op)
       return res.status(404).json({ message: "Role/Table/Operation missing" });
 
-    const exist = await prisma.rolePermission.findUnique({
+    let permissionUser = await prisma.rolePermission.findUnique({
       where: {
         roleId_tableId_operationId: {
           roleId: role.id,
@@ -34,30 +33,36 @@ export async function assignPermission(req, res) {
       }
     });
 
-    if (exist)
-      await prisma.rolePermission.update({
-      where : {
-        roleId_tableId_operationId: {
+    if (!permissionUser) {
+      permissionUser = await prisma.rolePermission.create({
+        data: {
           roleId: role.id,
           tableId: table.id,
           operationId: op.id
         }
-      },
-      data : {
-        isDeleted : false,
-      }
-    });
-      return res.status(200).json({ message: "Permission Granted" });
+      });
+    } else if (permissionUser.isDeleted) {
+      await prisma.rolePermission.update({
+        where: {
+          roleId_tableId_operationId: {
+            roleId: role.id,
+            tableId: table.id,
+            operationId: op.id
+          }
+        },
+        data: {
+          isDeleted: false,
+        }
+      });
+    } else {
+      return res.status(200).json({ message: "Permission already exitns ..." });
+    }
 
-    await prisma.rolePermission.create({
-      data: {
-        roleId: role.id,
-        tableId: table.id,
-        operationId: op.id
-      }
-    });
+    req.objectId = permissionUser.id;
 
     res.json({ message: "Permission granted" });
+
+    next();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -88,7 +93,7 @@ export async function deAssignPermission(req, res) {
     if (!role || !table || !op)
       return res.status(404).json({ message: "Role/Table/Operation missing" });
 
-    const exist = await prisma.rolePermission.findUnique({
+    const permissionUser = await prisma.rolePermission.findUnique({
       where: {
         roleId_tableId_operationId: {
           roleId: role.id,
@@ -98,21 +103,23 @@ export async function deAssignPermission(req, res) {
       }
     });
 
-    if (!exist)
+    if (!permissionUser || permissionUser.isDeleted)
       return res.status(409).json({ message: "This permission does not exists!" });
 
     await prisma.rolePermission.update({
-      where : {
+      where: {
         roleId_tableId_operationId: {
           roleId: role.id,
           tableId: table.id,
           operationId: op.id
         }
       },
-      data : {
-        isDeleted : true,
+      data: {
+        isDeleted: true,
       }
     });
+    
+    req.objectId = permissionUser;
 
     res.json({ message: "Permission taken ..." });
   } catch (err) {
