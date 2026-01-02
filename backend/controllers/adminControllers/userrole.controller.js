@@ -15,7 +15,11 @@ export async function assignRoleToUser(req , res){
                 rolename : rolename,
             }
         })
-    
+        
+        if(!user || !role){
+            return res.status(400).json({message : "invalid matadata"});
+        }
+
         const userrole = await prisma.userRole.findUnique({
             where : {
                 userId_roleId : {
@@ -58,6 +62,10 @@ export async function deAssignRoleFromUser(req , res){
                 rolename : rolename,
             }
         })
+
+        if(!user || !role){
+            return res.status(400).json({message : "invalid matadata"});
+        }
     
         const userrole = await prisma.userRole.findUnique({
             where : {
