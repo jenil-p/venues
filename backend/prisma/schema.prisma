@@ -368,6 +368,7 @@ model User {
   username      String? @unique
   email         String? @unique
   isverified    Boolean @default(false)
+  isDeleted     Boolean @default(false)
 
   roles           UserRole[]
   wishlists       Wishlist[]
