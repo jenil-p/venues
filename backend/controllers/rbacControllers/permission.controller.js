@@ -47,7 +47,7 @@ export async function assignPermission(req, res) {
         isDeleted : false,
       }
     });
-      return res.status(409).json({ message: "Permission Granted" });
+      return res.status(200).json({ message: "Permission Granted" });
 
     await prisma.rolePermission.create({
       data: {
