@@ -37,6 +37,7 @@ model City {
 
   state   State     @relation(fields: [stateId], references: [id])
   address Address[]
+  service Service[]
 }
 
 // ------------------ ADDRESS ------------------
@@ -261,11 +262,13 @@ model Service {
   description String?
   basePrice   Float
 
-  categoryId Int?
+  categoryId Int
   providerId Int
+  cityId     Int
 
-  category ServiceCategory? @relation(fields: [categoryId], references: [id])
+  category ServiceCategory @relation(fields: [categoryId], references: [id])
   provider ServiceProvider  @relation(fields: [providerId], references: [id])
+  city     City @relation(fields: [cityId] , references: [id])
 
   bookings          BookingService[]
   serviceReviews    ServiceReview[]
