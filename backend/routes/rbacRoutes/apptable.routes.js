@@ -3,7 +3,6 @@ import { createAppTable } from "../../controllers/rbacControllers/apptable.contr
 import { checkForAuthenticationCookie } from "../../middlewares/authentication.middleware.js";
 import { hasPermission } from "../../middlewares/permission.middleware.js";
 import { logAction } from "../../middlewares/actionlog.middleware.js";
-import { log } from "console";
 
 const router = express.Router();
 
