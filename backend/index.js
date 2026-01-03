@@ -15,6 +15,10 @@ import apptableRoutes from './routes/rbacRoutes/apptable.routes.js';
 import permissionRoutes from './routes/rbacRoutes/permission.routes.js';
 import operationRoutes from './routes/rbacRoutes/operation.routes.js';
 
+import venuehostRoutes from './routes/venue/hostmaster.route.js';
+
+import adminhostRoutes from './routes/adminRoutes/adminHost.route.js';
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -43,8 +47,8 @@ app.use('/admin/table' , apptableRoutes);
 app.use('/admin/operation', operationRoutes);
 app.use('/admin/permission' , permissionRoutes);
 
-app.get('/', (req, res) => {
-    res.send('this is a venue finding and booking application...');
-});
+app.use('/host' , venuehostRoutes);
+
+app.use('/admin/host' , adminhostRoutes);
 
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
