@@ -67,6 +67,37 @@ enum PriceUnit {
   DAILY
 }
 
+enum HostRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ----------------------- BOOKING STATUS ENUM -----------------------
+enum BookingStatus {
+  CART
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REFUNDED
+}
+
+// ----------------------- PAYMENT ENUMS -----------------------
+enum PaymentMethod {
+  UPI
+  CREDIT_CARD
+  CASH
+  BANK_CHEQUE
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  FAILED
+  CANCELLED
+}
+
 //-----------------------------------------------------------------------------------------------------------------------------
 
 // ============================================
@@ -208,6 +239,8 @@ model ServiceProvider {
   email   String?
   userId  Int?
 
+  status HostRequestStatus @default(PENDING)
+
   user User? @relation(fields: [userId], references: [id])
 
   services Service[]
@@ -274,30 +307,6 @@ model ServiceStatistic {
 // =============   Bookings   ==================
 // ============================================
 
-// ----------------------- BOOKING STATUS ENUM -----------------------
-enum BookingStatus {
-  CART
-  PENDING_PAYMENT
-  CONFIRMED
-  CANCELLED
-  COMPLETED
-  REFUNDED
-}
-
-// ----------------------- PAYMENT ENUMS -----------------------
-enum PaymentMethod {
-  UPI
-  CREDIT_CARD
-  CASH
-  BANK_CHEQUE
-}
-
-enum PaymentStatus {
-  SUCCESS
-  PENDING
-  FAILED
-  CANCELLED
-}
 
 // ----------------------- BOOKING -----------------------
 model Booking {
@@ -487,6 +496,8 @@ model HostMaster {
   pannumber String
   idProof   String?
   photo     String?
+
+  status HostRequestStatus @default(PENDING)
 
   user User @relation(fields: [userId], references: [id])
 
