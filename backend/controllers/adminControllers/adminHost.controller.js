@@ -83,6 +83,7 @@ export async function getAllHost(req , res, next) {
     const hosts = await prisma.hostMaster.findMany({});
  
     res.status(200).json({ message: "got all hosts", hosts });
+    next();
   } catch (error) {
     return res.status(400).json({ message: "internal server error: ", error });
   }
