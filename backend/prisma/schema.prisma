@@ -235,7 +235,7 @@ model VenuePricingRule {
 // ----------------------- SERVICE PROVIDER -----------------------
 model ServiceProvider {
   id      Int     @id @default(autoincrement())
-  userId  Int
+  userId  Int     @unique
   name    String
   contact String
   email   String?
