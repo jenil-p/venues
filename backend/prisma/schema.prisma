@@ -242,7 +242,7 @@ model ServiceProvider {
 
   status HostRequestStatus @default(PENDING)
 
-  user User? @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   services Service[]
 }
@@ -259,7 +259,7 @@ model ServiceCategory {
 model Service {
   id          Int     @id @default(autoincrement())
   name        String
-  description String?
+  description String
   basePrice   Float
 
   categoryId Int
