@@ -20,7 +20,7 @@ export async function requestHost(req, res) {
     }
 
     else if (existingHost && existingHost.status == "REJECTED"){
-        return res.status(409).json({ message: "your request has been rejected ..." })
+        return res.status(200).json({ message: "your request has been rejected ..." })
     }
 
     if(!contact1 || !fullname){

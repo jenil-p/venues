@@ -1,6 +1,6 @@
 import express from 'express';
 import { checkForAuthenticationCookie } from "../../middlewares/authentication.middleware.js";
-import { requestHost, myRequest } from '../../controllers/venue/hostmaster.controller.js';
+import { requestHost, myRequest } from '../../controllers/venueControllers/hostmaster.controller.js';
 
 const router = express.Router();
 
