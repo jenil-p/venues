@@ -55,4 +55,8 @@ app.use('/service-p' , serviceproviderRoutes);
 app.use('/admin/host' , adminhostRoutes);
 app.use('/admin/service-p' , adminServicePRoutes);
 
+// temp
+import tempRoutes from './routes/dlogin.route.js';
+app.use('/d/login', tempRoutes);
+
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));

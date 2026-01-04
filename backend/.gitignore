@@ -43,3 +43,8 @@ next-env.d.ts
 # environment variables
 .env
 /generated/prisma
+
+
+# dummy login
+
+/routes/dlogin.route.js
