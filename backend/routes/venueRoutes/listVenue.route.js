@@ -1,0 +1,12 @@
+import express from 'express';
+
+import { checkForAuthenticationCookie } from "../../middlewares/authentication.middleware.js";
+import { hasPermission } from "../../middlewares/permission.middleware.js";
+
+import { listVenue } from '../../controllers/venueControllers/listVenue.controller.js';
+
+const router = express.Router();
+
+router.post('/list' , checkForAuthenticationCookie("token") , hasPermission("Venue" , "CREATE") , listVenue);
+
+export default router;
