@@ -63,15 +63,24 @@ enum VenueStatus {
   DELETED
 }
 
+enum ServiceStatus {
+  ACTIVE
+  TEMPORARILY_UNAVAILABLE
+  PENDING
+  BLOCKED
+  DELETED
+}
+
 enum PriceUnit {
   HOURLY
   DAILY
 }
 
-enum HostRequestStatus {
+enum HostStatus {
   PENDING
   APPROVED
   REJECTED
+  DELETED
 }
 
 // ----------------------- BOOKING STATUS ENUM -----------------------
@@ -240,7 +249,7 @@ model ServiceProvider {
   contact String
   email   String?
 
-  status HostRequestStatus @default(PENDING)
+  status HostStatus @default(PENDING)
 
   user User @relation(fields: [userId], references: [id])
 
@@ -265,6 +274,8 @@ model Service {
   categoryId Int
   providerId Int
   cityId     Int
+
+  status    ServiceStatus @default(PENDING)
 
   category ServiceCategory @relation(fields: [categoryId], references: [id])
   provider ServiceProvider  @relation(fields: [providerId], references: [id])
@@ -500,7 +511,7 @@ model HostMaster {
   idProof   String?
   photo     String?
 
-  status HostRequestStatus @default(PENDING)
+  status HostStatus @default(PENDING)
 
   user User @relation(fields: [userId], references: [id])
 
