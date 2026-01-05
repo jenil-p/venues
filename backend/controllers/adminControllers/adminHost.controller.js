@@ -8,7 +8,7 @@ export async function approveHost(req, res, next) {
       where: { id: Number(id) }
     });
 
-    if (!host || host.status !== "PENDING") {
+    if (!host || host.status == "APPROVED") {
       return res.status(404).json({ message: "Invalid host request" });
     }
 
@@ -18,27 +18,27 @@ export async function approveHost(req, res, next) {
     });
 
     const role = await prisma.role.findUnique({
-        where:{
-            rolename: "VENUE_HOST"
-        }
+      where: {
+        rolename: "VENUE_HOST"
+      }
     })
 
     const isEntry = await prisma.userRole.findUnique({
-        where: {
-            userId_roleId: {
-                userId: host.userId,
-                roleId: role.id 
-            }
+      where: {
+        userId_roleId: {
+          userId: host.userId,
+          roleId: role.id
         }
+      }
     })
 
-    if(!isEntry){
-        await prisma.userRole.create({
-            data: {
-                userId: host.userId,
-                roleId: role.id 
-            }
-        })
+    if (!isEntry) {
+      await prisma.userRole.create({
+        data: {
+          userId: host.userId,
+          roleId: role.id
+        }
+      })
     }
 
     req.objectId = id;
@@ -78,13 +78,70 @@ export async function rejectHost(req, res, next) {
   }
 }
 
-export async function getAllHost(req , res, next) {
+export async function getAllHost(req, res, next) {
   try {
     const hosts = await prisma.hostMaster.findMany({});
- 
+
     res.status(200).json({ message: "got all hosts", hosts });
     next();
   } catch (error) {
     return res.status(400).json({ message: "internal server error: ", error });
+  }
+}
+
+export async function getHost(req, res, next) {
+  try {
+    const { hostId } = req.params;
+
+    const host = await prisma.hostMaster.findUnique({
+      where: {
+        id: Number(hostId)
+      }
+    })
+
+    if (!host) {
+      return res.status(404).json({ message: "host not found." });
+    }
+
+    res.status(200).json({ host });
+
+    req.objectId = host.id;
+
+    next();
+  } catch (err) {
+    return res.status(400).json({ message: "error getting host", err });
+  }
+}
+
+export async function deleteHost(req, res, next) {
+  try {
+    const { hostId } = req.params;
+
+    const hostExists = await prisma.hostMaster.findUnique({
+      where: {
+        id: Number(hostId)
+      }
+    })
+
+    if (!hostExists) {
+      return res.status(404).json({ message: "host not found." });
+    }
+
+    const host = await prisma.hostMaster.update({
+      where: {
+        id: Number(hostId)
+      },
+      data: {
+        status: "DELETED",
+      }
+    })
+
+    res.status(200).json({ message: "host deleted successfully.", host });
+
+    req.objectId = host.id;
+
+    next();
+  } catch (err) {
+    return res.status(400).json({ message: "error deleting host", err });
   }
 }
