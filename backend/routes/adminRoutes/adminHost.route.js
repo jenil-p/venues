@@ -6,14 +6,16 @@ import { logAction } from "../../middlewares/actionlog.middleware.js";
 
 const router = express.Router();
 
-router.post( "/host-requests/:id/approve", checkForAuthenticationCookie("token"), hasPermission("HostMaster", "APPROVE"), approveHost, logAction("HostMaster", "APPROVE"));
+router.use(checkForAuthenticationCookie("token"));
 
-router.post( "/host-requests/:id/reject", checkForAuthenticationCookie("token"), hasPermission("HostMaster", "REJECT"), rejectHost, logAction("HostMaster", "REJECT"));
+router.post( "/host-requests/:id/approve", hasPermission("HostMaster", "APPROVE"), approveHost, logAction("HostMaster", "APPROVE"));
 
-router.get("/get-all-hosts" , checkForAuthenticationCookie("token"), hasPermission("HostMaster", "VIEW_ALL"), getAllHost, logAction("HostMaster", "VIEW_ALL"))
+router.post( "/host-requests/:id/reject", hasPermission("HostMaster", "REJECT"), rejectHost, logAction("HostMaster", "REJECT"));
 
-router.get("/:hostId" , checkForAuthenticationCookie("token") , hasPermission("HostMaster" , "READ"), getHost, logAction("HostMaster" , "READ"));
+router.get("/get-all-hosts" , hasPermission("HostMaster", "VIEW_ALL"), getAllHost, logAction("HostMaster", "VIEW_ALL"))
 
-router.delete("/:hostId" , checkForAuthenticationCookie("token") , hasPermission("HostMaster" , "READ"), deleteHost, logAction("HostMaster" , "DELETE"));
+router.get("/:hostId" , hasPermission("HostMaster" , "READ"), getHost, logAction("HostMaster" , "READ"));
+
+router.delete("/:hostId" , hasPermission("HostMaster" , "DELETE"), deleteHost, logAction("HostMaster" , "DELETE"));
 
 export default router;

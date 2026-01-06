@@ -6,14 +6,16 @@ import { logAction } from "../../middlewares/actionlog.middleware.js";
 
 const router = express.Router();
 
-router.post( "/service-p-requests/:id/approve", checkForAuthenticationCookie("token"), hasPermission("ServiceProvider", "APPROVE"), approveServiceP, logAction("ServiceProvider", "APPROVE"));
+router.use(checkForAuthenticationCookie("token"));
 
-router.post( "/service-p-requests/:id/reject", checkForAuthenticationCookie("token"), hasPermission("ServiceProvider", "REJECT"), rejectServiceP, logAction("ServiceProvider", "REJECT"));
+router.post( "/service-p-requests/:id/approve", hasPermission("ServiceProvider", "APPROVE"), approveServiceP, logAction("ServiceProvider", "APPROVE"));
 
-router.get("/get-all-service-p" , checkForAuthenticationCookie("token"), hasPermission("ServiceProvider", "VIEW_ALL"), getAllServiceP, logAction("ServiceProvider", "VIEW_ALL"));
+router.post( "/service-p-requests/:id/reject", hasPermission("ServiceProvider", "REJECT"), rejectServiceP, logAction("ServiceProvider", "REJECT"));
 
-router.get("/:hostId" , checkForAuthenticationCookie("token") , hasPermission("HostMaster" , "READ"), getServiveP, logAction("HostMaster" , "READ"));
+router.get("/get-all-service-p" , hasPermission("ServiceProvider", "VIEW_ALL"), getAllServiceP, logAction("ServiceProvider", "VIEW_ALL"));
 
-router.delete("/:hostId" , checkForAuthenticationCookie("token") , hasPermission("HostMaster" , "READ"), deleteServiceP, logAction("HostMaster" , "DELETE"));
+router.get("/:hostId" , hasPermission("HostMaster" , "READ"), getServiveP, logAction("HostMaster" , "READ"));
+
+router.delete("/:hostId" , hasPermission("HostMaster" , "DELETE"), deleteServiceP, logAction("HostMaster" , "DELETE"));
 
 export default router;
