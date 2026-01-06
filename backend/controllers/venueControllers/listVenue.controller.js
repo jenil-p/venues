@@ -1,7 +1,7 @@
 import prisma from "../../prisma/client.js";
 
 export async function listVenue(req, res) {
-    // try {
+    try {
         const userId = req.user.id;
 
         const { venuename, description, capacity, contactemail, contactnumber1, contactnumber2, address } = req.body;
@@ -45,7 +45,7 @@ export async function listVenue(req, res) {
 
         return res.status(201).json({ message: "Venue created successfully", venueId: venue.id });
 
-    // } catch (err) {
-    //     return res.status(400).json({ message: "Error creating venue", err });
-    // }
+    } catch (err) {
+        return res.status(400).json({ message: "Error creating venue", err });
+    }
 }

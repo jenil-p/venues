@@ -21,6 +21,8 @@ import serviceproviderRoutes from './routes/serviceRoutes/serviceProvider.route.
 import adminhostRoutes from './routes/adminRoutes/adminHost.route.js';
 import adminServicePRoutes from './routes/adminRoutes/adminServicep.route.js';
 
+import listvenueRoutes from './routes/venueRoutes/listVenue.route.js';
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -51,6 +53,8 @@ app.use('/admin/permission' , permissionRoutes);
 
 app.use('/host' , venuehostRoutes);
 app.use('/service-p' , serviceproviderRoutes);
+
+app.use('/host/venue', listvenueRoutes);
 
 app.use('/admin/host' , adminhostRoutes);
 app.use('/admin/service-p' , adminServicePRoutes);
