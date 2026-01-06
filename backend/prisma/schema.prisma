@@ -56,6 +56,7 @@ model Address {
 
 // =================== ENUMS =====================
 enum VenueStatus {
+  DRAFT
   ACTIVE
   UNDER_MAINTENANCE
   PENDING
@@ -64,6 +65,7 @@ enum VenueStatus {
 }
 
 enum ServiceStatus {
+  DRAFT
   ACTIVE
   TEMPORARILY_UNAVAILABLE
   PENDING
@@ -77,6 +79,7 @@ enum PriceUnit {
 }
 
 enum HostStatus {
+  DRAFT
   PENDING
   APPROVED
   REJECTED
