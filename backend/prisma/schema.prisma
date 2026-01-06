@@ -126,7 +126,7 @@ model Venue {
   contactemail   String
   contactnumber1 String
   contactnumber2 String?
-  status         VenueStatus @default(PENDING)
+  status         VenueStatus @default(DRAFT)
 
   hostId Int
   host   HostMaster @relation(fields: [hostId], references: [id])
