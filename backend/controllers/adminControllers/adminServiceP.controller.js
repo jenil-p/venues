@@ -88,3 +88,60 @@ export async function getAllServiceP(req , res, next) {
     return res.status(400).json({ message: "internal server error: ", error });
   }
 }
+
+export async function getServiveP(req, res, next) {
+  try {
+    const { servicePId } = req.params;
+
+    const serviceP = await prisma.serviceProvider.findUnique({
+      where: {
+        id: Number(servicePId)
+      }
+    })
+
+    if (!serviceP) {
+      return res.status(404).json({ message: "service provider not found." });
+    }
+
+    res.status(200).json({ serviceP });
+
+    req.objectId = serviceP.id;
+
+    next();
+  } catch (err) {
+    return res.status(400).json({ message: "error getting service provider", err });
+  }
+}
+
+export async function deleteServiceP(req, res, next) {
+  try {
+    const { servicePId } = req.params;
+
+    const servicePExists = await prisma.serviceProvider.findUnique({
+      where: {
+        id: Number(servicePId)
+      }
+    })
+
+    if (!servicePExists) {
+      return res.status(404).json({ message: "service provider not found." });
+    }
+
+    const serviceP = await prisma.serviceProvider.update({
+      where: {
+        id: Number(servicePId)
+      },
+      data: {
+        status: "DELETED",
+      }
+    })
+
+    res.status(200).json({ message: "service provider deleted successfully.", serviceP });
+
+    req.objectId = serviceP.id;
+
+    next();
+  } catch (err) {
+    return res.status(400).json({ message: "error deleting service provider", err });
+  }
+}
