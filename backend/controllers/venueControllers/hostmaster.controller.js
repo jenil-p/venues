@@ -59,10 +59,6 @@ export async function myRequest(req, res) {
       where: { userId }
     });
 
-    if (!request) {
-      return res.status(404).json({ message: "No host request found" });
-    }
-
     return res.status(200).json(request);
 
   } catch (err) {

@@ -55,10 +55,6 @@ export async function myRequestServicProvider(req, res) {
       where: { userId }
     });
 
-    if (!request) {
-      return res.status(404).json({ message: "No service provider request found" });
-    }
-
     return res.status(200).json(request);
 
   } catch (err) {
