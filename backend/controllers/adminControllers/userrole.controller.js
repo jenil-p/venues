@@ -50,7 +50,7 @@ export async function assignRoleToUser(req, res, next) {
                     }
                 },
                 data: {
-                    isDeleted: true
+                    isDeleted: false
                 },
             })
         } else {
