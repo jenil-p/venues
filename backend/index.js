@@ -19,9 +19,12 @@ import providerRoutes from './routes/providerRoutes/provider.route.js';
 
 import adminProviderRoutes from './routes/adminRoutes/adminProvider.route.js';
 import adminvenueRoutes from './routes/adminRoutes/adminVenue.route.js';
+import adminserviceRoutes from './routes/adminRoutes/adminService.route.js';
 
 import listvenueRoutes from './routes/venueRoutes/listVenue.route.js';
 import updatevenueRoutes from './routes/venueRoutes/venue.route.js';
+
+import listserviceRoutes from './routes/serviceRoutes/listService.route.js';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -56,9 +59,12 @@ app.use('/provider' , providerRoutes);
 app.use('/provider/venue', listvenueRoutes); // first time listing 
 app.use('/provider/venue', updatevenueRoutes); // updating its details ...
 
+app.use('/provider/service', listserviceRoutes); // first time listing 
+
 app.use('/admin/provider' , adminProviderRoutes);
 
 app.use('/admin/venue', adminvenueRoutes);
+app.use('/admin/service', adminserviceRoutes);
 
 // temp
 import tempRoutes from './routes/dlogin.route.js';

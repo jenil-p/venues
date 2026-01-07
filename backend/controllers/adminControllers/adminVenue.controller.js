@@ -14,8 +14,6 @@ export async function approveVenue(req, res, next) {
             return res.status(404).json({ message: "invalid venue approval request!" });
         }
 
-        const provider = 
-
         await prisma.venue.update({
             where: {
                 id: Number(venueId),
