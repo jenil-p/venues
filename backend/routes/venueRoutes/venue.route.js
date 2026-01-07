@@ -10,18 +10,18 @@ const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
-router.put('/:venueId', validateProviderVenueOwnership, updateVenue);
+router.put('/:venueId', hasPermission("Venue" , "UPDATE"), validateProviderVenueOwnership, updateVenue);
 
-router.put('/:venueId/type' , validateProviderVenueOwnership, setVenueType);
+router.put('/:venueId/type' , hasPermission("VenueType" , "UPDATE"), validateProviderVenueOwnership, setVenueType);
 
-router.put('/:venueId/features', validateProviderVenueOwnership, setVenueFeatures);
+router.put('/:venueId/features', hasPermission("VenueFeature" , "UPDATE"), validateProviderVenueOwnership, setVenueFeatures);
 
-router.post('/:venueId/photos', validateProviderVenueOwnership, addVenuePhotos);
+router.post('/:venueId/photos', hasPermission("VenuePhoto" , "CREATE"), validateProviderVenueOwnership, addVenuePhotos);
 
-router.put('/:venueId/photos/reorder', validateProviderVenueOwnership, reorderPhotos);
+router.put('/:venueId/photos/reorder', hasPermission("VenuePhoto" , "UPDATE"), validateProviderVenueOwnership, reorderPhotos);
 
-router.put('/:venueId/pricing', validateProviderVenueOwnership, setPricing);
+router.put('/:venueId/pricing', hasPermission("VenuePricingRule" , "UPDATE"), validateProviderVenueOwnership, setPricing);
 
-router.put('/:venueId/submit', validateProviderVenueOwnership, submitVenue);
+router.put('/:venueId/submit', hasPermission("Venue" , "UPDATE"), validateProviderVenueOwnership, submitVenue);
 
 export default router;
