@@ -11,7 +11,8 @@ export const hasPermission = (tableName, operationName) => {
             
             const roles = await prisma.userRole.findMany({
                 where: {
-                    userId: user.id
+                    userId: user.id,
+                    isDeleted: false
                 }
             });
 
