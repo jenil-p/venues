@@ -2,18 +2,18 @@ import prisma from "../prisma/client.js";
 
 const CRITICAL_FIELDS = ["capacity", "addressId"];
 
-export async function validateHostVenueOwnership(req, res, next) {
+export async function validateProviderVenueOwnership(req, res, next) {
     try {
         const user = req.user;
 
-        const host = await prisma.hostMaster.findUnique({
+        const provider = await prisma.providerProfile.findUnique({
             where: {
                 userId: user.id,
             }
         })
 
-        if (!host || host.status !== "APPROVED") {
-            return res.status(403).json({ message: "Only approved hosts can manage venues" });
+        if (!provider || provider.status !== "APPROVED") {
+            return res.status(403).json({ message: "Only approved provider can manage venues" });
         }
 
         const { venueId } = req.params;
@@ -32,11 +32,11 @@ export async function validateHostVenueOwnership(req, res, next) {
             return res.status(404).json({ message: "This venue is blocked or deleted." })
         }
 
-        if (venue.hostId != host.id) {
+        if (venue.providerId != provider.id) {
             return res.status(403).json({ message: "You do not own this venue" });
         }
 
-        // check if host is trying to update the critical fields...
+        // check if provider is trying to update the critical fields...
         if (venue.status === "ACTIVE" || venue.status === "UNDER_MAINTENANCE") {
             const bodyKeys = Object.keys(req.body || {});
             const isCriticalChange = bodyKeys.some(key =>
@@ -55,10 +55,10 @@ export async function validateHostVenueOwnership(req, res, next) {
         }
 
         req.venue = venue;
-        req.CurrentHost = host;
+        req.currentProvider = provider;
         next();
 
     } catch (err) {
-        return res.status(500).json({ error: "validation of host venue ownership failed!" });
+        return res.status(500).json({ error: "validation of provider venue ownership failed!" });
     }
 };

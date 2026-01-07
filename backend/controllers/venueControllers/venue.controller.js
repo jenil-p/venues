@@ -34,7 +34,7 @@ export async function setVenueType(req, res) {
 
 export async function setVenueFeatures(req, res) {
   const { venueId } = req.params;
-  const { featureIds } = req.body;
+  const { featureIds } = req.body; // [ featureId ]
 
   await prisma.$transaction([
     prisma.venueFeature.deleteMany({
@@ -66,10 +66,10 @@ export async function addVenuePhotos(req, res) {
 }
 
 export async function reorderPhotos(req, res) {
-  const updates = req.body.order;
+  const updates = req.body.order; // [{ photoId, order }]
 
   await prisma.$transaction(
-    updates.map(p => 
+    updates.map(p =>
       prisma.venuePhoto.update({
         where: { id: p.photoId },
         data: { order: p.order }

@@ -8,7 +8,6 @@ dotenv.config();
 //importing routes ...
 import authRoutes from './routes/auth.route.js';
 import roleRoutes from './routes/adminRoutes/role.route.js';
-import adminRoutes from './routes/adminRoutes/admin.route.js';
 
 import assignRoutes from './routes/adminRoutes/userrole.route.js';
 
@@ -16,11 +15,9 @@ import apptableRoutes from './routes/rbacRoutes/apptable.routes.js';
 import permissionRoutes from './routes/rbacRoutes/permission.routes.js';
 import operationRoutes from './routes/rbacRoutes/operation.routes.js';
 
-import venuehostRoutes from './routes/venueRoutes/hostmaster.route.js';
-import serviceproviderRoutes from './routes/serviceRoutes/serviceProvider.route.js';
+import providerRoutes from './routes/providerRoutes/provider.route.js';
 
-import adminhostRoutes from './routes/adminRoutes/adminHost.route.js';
-import adminServicePRoutes from './routes/adminRoutes/adminServicep.route.js';
+import adminProviderRoutes from './routes/adminRoutes/adminProvider.route.js';
 import adminvenueRoutes from './routes/adminRoutes/adminVenue.route.js';
 
 import listvenueRoutes from './routes/venueRoutes/listVenue.route.js';
@@ -48,21 +45,18 @@ app.use('/admin/role' , roleRoutes);
 
 // admin functionalities
 app.use('/admin/userrole' , assignRoutes);
-app.use('/admin/a' , adminRoutes);
 
 // RBAC (admin)
 app.use('/admin/table' , apptableRoutes);
 app.use('/admin/operation', operationRoutes);
 app.use('/admin/permission' , permissionRoutes);
 
-app.use('/host' , venuehostRoutes);
-app.use('/service-p' , serviceproviderRoutes);
+app.use('/provider' , providerRoutes);
 
-app.use('/host/venue', listvenueRoutes); // first time listing 
-app.use('/host/venue', updatevenueRoutes); // updating its details ...
+app.use('/provider/venue', listvenueRoutes); // first time listing 
+app.use('/provider/venue', updatevenueRoutes); // updating its details ...
 
-app.use('/admin/host' , adminhostRoutes);
-app.use('/admin/service-p' , adminServicePRoutes);
+app.use('/admin/provider' , adminProviderRoutes);
 
 app.use('/admin/venue', adminvenueRoutes);
 

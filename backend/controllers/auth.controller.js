@@ -101,7 +101,7 @@ export async function createUser(req, res) {
 
     const findRoleAsUser = await prisma.role.findUnique({
         where : {
-            rolename : 'user',
+            rolename : 'USER',
         }
     })
 

@@ -6,12 +6,12 @@ export async function listVenue(req, res) {
 
         const { venuename, description, capacity, contactemail, contactnumber1, contactnumber2, address } = req.body;
 
-        const host = await prisma.hostMaster.findUnique({
+        const provider = await prisma.providerProfile.findUnique({
             where: { userId }
         });
 
-        if (!host || host.status !== "APPROVED") {
-            return res.status(403).json({ message: "Only approved hosts can list venues" });
+        if (!provider || provider.status !== "APPROVED") {
+            return res.status(403).json({ message: "Only approved providers can list venues" });
         }
 
         if ( !venuename || !capacity || !contactemail || !contactnumber1 || !address) {
@@ -38,7 +38,7 @@ export async function listVenue(req, res) {
                 contactemail,
                 contactnumber1,
                 contactnumber2,
-                hostId: host.id,
+                providerId: provider.id,
                 addressId: createdAddress.id
             }
         });

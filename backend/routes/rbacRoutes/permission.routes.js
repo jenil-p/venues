@@ -6,8 +6,8 @@ import { logAction } from "../../middlewares/actionlog.middleware.js";
 
 const router = express.Router();
 
-router.post("/assign-permission", checkForAuthenticationCookie("token"), hasPermission("RolePermission" , "MANAGE_PERMISSION"), assignPermission , logAction("RolePermission" , "MANAGE_PERMISSION"));
+router.post("/assign-permission", checkForAuthenticationCookie("token"), hasPermission("RolePermission" , "CREATE"), assignPermission , logAction("RolePermission" , "CREATE"));
 
-router.patch("/de-assign-permission" , checkForAuthenticationCookie("token"), hasPermission("RolePermission" , "MANAGE_PERMISSION"), deAssignPermission, logAction("RolePermission" , "MANAGE_PERMISSION"))
+router.patch("/de-assign-permission" , checkForAuthenticationCookie("token"), hasPermission("RolePermission" , "DELETE"), deAssignPermission, logAction("RolePermission" , "DELETE"))
 
 export default router;

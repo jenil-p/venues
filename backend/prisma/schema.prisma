@@ -51,7 +51,8 @@ model Address {
 
   city City @relation(fields: [cityId], references: [id])
 
-  venues Venue[]
+  venues   Venue[]
+  provider ProviderProfile[]
 }
 
 // =================== ENUMS =====================
@@ -78,7 +79,7 @@ enum PriceUnit {
   DAILY
 }
 
-enum HostStatus {
+enum ProviderStatus  {
   DRAFT
   PENDING
   APPROVED
@@ -128,8 +129,8 @@ model Venue {
   contactnumber2 String?
   status         VenueStatus @default(DRAFT)
 
-  hostId Int
-  host   HostMaster @relation(fields: [hostId], references: [id])
+  providerId Int
+  provider   ProviderProfile @relation(fields: [providerId], references: [id])
 
   addressId Int
   address   Address @relation(fields: [addressId], references: [id])
@@ -244,21 +245,6 @@ model VenuePricingRule {
 // =============   Service   ==================
 // ============================================
 
-// ----------------------- SERVICE PROVIDER -----------------------
-model ServiceProvider {
-  id      Int     @id @default(autoincrement())
-  userId  Int     @unique
-  name    String
-  contact String
-  email   String?
-
-  status HostStatus @default(PENDING)
-
-  user User @relation(fields: [userId], references: [id])
-
-  services Service[]
-}
-
 // ================= SERVICE CATEGORY =================
 model ServiceCategory {
   id   Int    @id @default(autoincrement())
@@ -269,7 +255,7 @@ model ServiceCategory {
 
 // ================= SERVICE =================
 model Service {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
   description String
   basePrice   Float
@@ -278,11 +264,11 @@ model Service {
   providerId Int
   cityId     Int
 
-  status    ServiceStatus @default(PENDING)
+  status ServiceStatus @default(PENDING)
 
   category ServiceCategory @relation(fields: [categoryId], references: [id])
-  provider ServiceProvider  @relation(fields: [providerId], references: [id])
-  city     City @relation(fields: [cityId] , references: [id])
+  provider ProviderProfile @relation(fields: [providerId], references: [id])
+  city     City            @relation(fields: [cityId], references: [id])
 
   bookings          BookingService[]
   serviceReviews    ServiceReview[]
@@ -323,7 +309,6 @@ model ServiceStatistic {
 // ============================================
 // =============   Bookings   ==================
 // ============================================
-
 
 // ----------------------- BOOKING -----------------------
 model Booking {
@@ -390,8 +375,7 @@ model Payment {
 model User {
   id            Int     @id @default(autoincrement())
   contactnumber String  @unique
-  fullname      String?
-  username      String? @unique
+  fullname      String
   email         String? @unique
   isverified    Boolean @default(false)
   isDeleted     Boolean @default(false)
@@ -399,8 +383,7 @@ model User {
   roles           UserRole[]
   wishlists       Wishlist[]
   logs            ActionLog[]
-  hostmaster      HostMaster?
-  servs           ServiceProvider[]
+  provider        ProviderProfile?
   venuereviews    VenueReview[]
   servicesreviews ServiceReview[]
   bookings        Booking[]
@@ -503,20 +486,23 @@ model Wishlist {
   @@unique([userId, venueId])
 }
 
-// ----------------------- HOST MASTER -----------------------
-model HostMaster {
-  id        Int     @id @default(autoincrement())
-  userId    Int     @unique
-  fullname  String
-  contact1  String
-  contact2  String?
-  pannumber String
-  idProof   String?
-  photo     String?
+// ----------------------- PROVIDER -----------------------
+model ProviderProfile {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  legalname    String
+  contact1     String
+  contact2     String?
+  dateOfBirth DateTime
+  idProof      String
+  photo        String
+  addressId    Int
 
-  status HostStatus @default(PENDING)
+  status ProviderStatus @default(DRAFT)
 
-  user User @relation(fields: [userId], references: [id])
+  address Address @relation(fields: [addressId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-  venues Venue[]
+  venues   Venue[]
+  services Service[]
 }

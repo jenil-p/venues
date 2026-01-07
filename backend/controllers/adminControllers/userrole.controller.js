@@ -20,7 +20,7 @@ export async function assignRoleToUser(req, res, next) {
             return res.status(400).json({ message: "invalid matadata" });
         }
 
-        if(rolename == "ADMIN" || rolename == "SUPER_ADMIN"){
+        if(rolename == "ADMIN"){
             return res.status(401).json({ message: "you are not authorized to do this operation."});
         }
 
@@ -54,7 +54,7 @@ export async function assignRoleToUser(req, res, next) {
                 },
             })
         } else {
-            return resstatus(409).json({ message: "User already has this role" });
+            return res.status(409).json({ message: "User already has this role" });
         }
 
 
@@ -83,7 +83,7 @@ export async function deAssignRoleFromUser(req, res, next) {
             return res.status(400).json({ message: "Invalid metadata" });
         }
         
-        if(rolename == "ADMIN" || rolename == "SUPER_ADMIN"){
+        if(rolename == "ADMIN"){
             return res.status(401).json({ message: "you are not authorized to do this operation."});
         }
 
