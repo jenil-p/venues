@@ -28,12 +28,12 @@ export async function validateProviderVenueOwnership(req, res, next) {
             return res.status(400).json({ message: "no venue found." });
         }
 
-        if (venue.status === "BLOCKED" || venue.status === "DELETED") {
-            return res.status(404).json({ message: "This venue is blocked or deleted." })
-        }
-
         if (venue.providerId != provider.id) {
             return res.status(403).json({ message: "You do not own this venue" });
+        }
+
+        if (venue.status === "BLOCKED" || venue.status === "DELETED") {
+            return res.status(404).json({ message: "This venue is blocked or deleted." })
         }
 
         // check if provider is trying to update the critical fields...
