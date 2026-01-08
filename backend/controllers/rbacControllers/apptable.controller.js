@@ -10,7 +10,7 @@ export async function createAppTable(req, res, next) {
       }
     });
 
-    if (exists) return res.status(400).json({ message: "Table already exists" });
+    if (exists) return res.status(409).json({ message: "Table already exists" });
 
     const table = await prisma.appTable.create({
       data: {

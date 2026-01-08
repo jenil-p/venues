@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: process.env.DEVELOPMENT_FRONTEND_URL,
         credentials: true,
     })
 );

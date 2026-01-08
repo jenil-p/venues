@@ -10,7 +10,7 @@ export async function addRole(req, res, next) {
             }
         })
         if (isRole) {
-            return res.status(500).json({ message: "role already exists ..." });
+            return res.status(409).json({ message: "role already exists ..." });
         }
 
         const role = await prisma.role.create({
@@ -25,7 +25,7 @@ export async function addRole(req, res, next) {
 
         next();
     } catch (error) {
-        return res.status(400).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 }
 
@@ -53,6 +53,6 @@ export async function deleteRole(req, res, next) {
         res.status(200).json({ message: "role deleted successfully ...", deleteRole });
         next();
     }catch(err){
-        return res.status(400).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }

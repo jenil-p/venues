@@ -8,8 +8,12 @@ export async function approveProvider(req, res, next) {
       where: { id: Number(id) }
     });
 
-    if (!provider || provider.status == "APPROVED") {
+    if (!provider) {
       return res.status(404).json({ message: "Invalid provider request" });
+    }
+
+    if(provider.status == "APPROVED"){
+      return res.status(409).json({ message: "provider is already approved."})
     }
 
     await prisma.providerProfile.update({
@@ -47,7 +51,7 @@ export async function approveProvider(req, res, next) {
     next();
 
   } catch (err) {
-    return res.status(400).json({ message: "Error occurred", err });
+    return res.status(500).json({ message: "Error occurred", err });
   }
 }
 
@@ -59,8 +63,12 @@ export async function rejectProvider(req, res, next) {
       where: { id: Number(id) }
     });
 
-    if (!provider || provider.status !== "PENDING") {
+    if (!provider) {
       return res.status(404).json({ message: "Invalid provider request" });
+    }
+
+    if(provider.status !== "PENDING"){
+      return res.status(409).json({ message: "status conflict."})
     }
 
     await prisma.providerProfile.update({
@@ -74,7 +82,7 @@ export async function rejectProvider(req, res, next) {
     next();
 
   } catch (err) {
-    return res.status(400).json({ message: "Error occurred", err });
+    return res.status(500).json({ message: "Error occurred", err });
   }
 }
 
@@ -85,7 +93,7 @@ export async function getAllProvider(req, res, next) {
     res.status(200).json({ message: "got all providers", providers });
     next();
   } catch (error) {
-    return res.status(400).json({ message: "internal server error: ", error });
+    return res.status(500).json({ message: "internal server error: ", error });
   }
 }
 
@@ -109,7 +117,7 @@ export async function getProvider(req, res, next) {
 
     next();
   } catch (err) {
-    return res.status(400).json({ message: "error getting provider", err });
+    return res.status(500).json({ message: "error getting provider", err });
   }
 }
 
@@ -142,6 +150,6 @@ export async function deleteProvider(req, res, next) {
 
     next();
   } catch (err) {
-    return res.status(400).json({ message: "error deleting provider", err });
+    return res.status(500).json({ message: "error deleting provider", err });
   }
 }

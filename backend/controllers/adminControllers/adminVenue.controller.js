@@ -10,8 +10,12 @@ export async function approveVenue(req, res, next) {
             }
         })
 
-        if (!venue || venue.status === "ACTIVE") {
-            return res.status(404).json({ message: "invalid venue approval request!" });
+        if(!venue){
+            return res.status(404).json({ message: "venue not found" })
+        }
+
+        if (venue.status === "ACTIVE") {
+            return res.status(409).json({ message: "invalid venue approval request!" });
         }
 
         await prisma.venue.update({
@@ -29,7 +33,7 @@ export async function approveVenue(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error approving venue" });
+        return res.status(500).json({ message: "error approving venue" });
     }
 }
 
@@ -44,8 +48,12 @@ export async function rejectVenue(req, res, next) {
             }
         })
 
-        if (!venue || venue.status === "BLOCKED") {
-            return res.status(404).json({ message: "invalid venue approval request!" });
+        if(!venue){
+            return res.status(404).json({ message: "venue not found" })
+        }
+
+        if (venue.status === "BLOCKED") {
+            return res.status(409).json({ message: "invalid venue approval request!" });
         }
 
         await prisma.venue.update({
@@ -63,7 +71,7 @@ export async function rejectVenue(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error rejecting venue" });
+        return res.status(500).json({ message: "error rejecting venue" });
     }
 }
 
@@ -76,7 +84,7 @@ export async function getAllVenues(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error fatching venues." });
+        return res.status(500).json({ message: "error fatching venues." });
     }
 }
 
@@ -108,7 +116,7 @@ export async function getVenue(req, res, next) {
         res.status(200).json({ venue });
         next();
     } catch (err) {
-        return res.status(400).json({ message: "failed getting venue" });
+        return res.status(500).json({ message: "failed getting venue" });
     }
 }
 
@@ -145,6 +153,6 @@ export async function deleteVenue(req, res, next) {
         res.status(200).json({message: "venue deleted successfully.", venue });
         next();
     } catch (err) {
-        return res.status(400).json({ message: "failed deleting venue" });
+        return res.status(500).json({ message: "failed deleting venue" });
     }
 }

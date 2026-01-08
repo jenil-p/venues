@@ -25,7 +25,7 @@ export async function validateProviderServiceOwnership(req, res, next) {
         })
 
         if (!service) {
-            return res.status(400).json({ message: "no service found." });
+            return res.status(404).json({ message: "no service found." });
         }
 
         if (service.providerId != provider.id) {

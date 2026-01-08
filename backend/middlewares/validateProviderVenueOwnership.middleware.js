@@ -25,7 +25,7 @@ export async function validateProviderVenueOwnership(req, res, next) {
         })
 
         if (!venue) {
-            return res.status(400).json({ message: "no venue found." });
+            return res.status(404).json({ message: "no venue found." });
         }
 
         if (venue.providerId != provider.id) {

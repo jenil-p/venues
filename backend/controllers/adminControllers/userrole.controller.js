@@ -21,7 +21,7 @@ export async function assignRoleToUser(req, res, next) {
         }
 
         if(rolename == "ADMIN"){
-            return res.status(401).json({ message: "you are not authorized to do this operation."});
+            return res.status(403).json({ message: "you are not authorized to do this operation."});
         }
 
         let userrole = await prisma.userRole.findUnique({
@@ -63,7 +63,7 @@ export async function assignRoleToUser(req, res, next) {
         res.status(200).json({ message: "user assigned the role successfully." })
         next();
     } catch (err) {
-        return res.status(400).json({ message: "error occured ...", err });
+        return res.status(500).json({ message: "error occured ...", err });
     }
 }
 
@@ -84,7 +84,7 @@ export async function deAssignRoleFromUser(req, res, next) {
         }
         
         if(rolename == "ADMIN"){
-            return res.status(401).json({ message: "you are not authorized to do this operation."});
+            return res.status(403).json({ message: "you are not authorized to do this operation."});
         }
 
         let userRole = await prisma.userRole.findUnique({
@@ -117,6 +117,6 @@ export async function deAssignRoleFromUser(req, res, next) {
         res.status(200).json({message: "role de-assigned from user sucessfully..."});
         next();
     } catch (err) {
-        return res.status(400).json({ message: "Error occurred", err });
+        return res.status(500).json({ message: "Error occurred", err });
     }
 }

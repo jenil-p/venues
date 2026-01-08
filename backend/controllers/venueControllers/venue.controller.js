@@ -8,7 +8,7 @@ export async function updateVenue(req, res) {
     data: req.body
   });
 
-  res.json({ message: "Venue updated" });
+  return res.json({ message: "Venue updated" });
 }
 
 export async function setVenueType(req, res) {
@@ -29,7 +29,7 @@ export async function setVenueType(req, res) {
   ]);
 
 
-  res.json({ message: "Venue type set" });
+  return res.json({ message: "Venue type set" });
 }
 
 export async function setVenueFeatures(req, res) {
@@ -48,7 +48,7 @@ export async function setVenueFeatures(req, res) {
     })
   ])
 
-  res.json({ message: "Features updated" });
+  return res.json({ message: "Features updated" });
 }
 
 export async function addVenuePhotos(req, res) {
@@ -62,7 +62,7 @@ export async function addVenuePhotos(req, res) {
     }))
   });
 
-  res.json({ message: "Photos added" });
+  return res.json({ message: "Photos added" });
 }
 
 export async function reorderPhotos(req, res) {
@@ -77,7 +77,7 @@ export async function reorderPhotos(req, res) {
     )
   );
 
-  res.json({ message: "Photos reordered" });
+  return res.json({ message: "Photos reordered" });
 }
 
 export async function setPricing(req, res) {
@@ -97,7 +97,7 @@ export async function setPricing(req, res) {
   ])
 
 
-  res.json({ message: "Pricing updated" });
+  return res.json({ message: "Pricing updated" });
 }
 
 export async function submitVenue(req, res) {
@@ -108,5 +108,5 @@ export async function submitVenue(req, res) {
     data: { status: "PENDING" }
   });
 
-  res.json({ message: "Venue submitted for review" });
+  return res.json({ message: "Venue submitted for review" });
 }

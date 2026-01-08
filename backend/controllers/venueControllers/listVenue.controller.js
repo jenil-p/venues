@@ -46,6 +46,6 @@ export async function listVenue(req, res) {
         return res.status(201).json({ message: "Venue created successfully", venueId: venue.id });
 
     } catch (err) {
-        return res.status(400).json({ message: "Error creating venue", err });
+        return res.status(500).json({ message: "Error creating venue", err });
     }
 }

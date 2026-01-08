@@ -33,7 +33,7 @@ export const hasPermission = (tableName, operationName) => {
             });
 
             if (!table || !op){
-                return res.status(400).json({ message: "Invalid metadata" });
+                return res.status(500).json({ message: "Invalid metadata" });
             }
 
             const allowed = await prisma.rolePermission.findFirst({

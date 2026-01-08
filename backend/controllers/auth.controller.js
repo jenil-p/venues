@@ -21,7 +21,7 @@ export async function sendOtp(req, res) {
         })
 
         if (!user) {
-            return res.status(401).json({ message: "Unauthorised access..." });
+            return res.status(404).json({ message: "user not found" });
         }
 
         const verification = await client.verify.v2
@@ -49,7 +49,7 @@ export async function verifyOtp(req, res) {
         })
 
         if (!user) {
-            return res.status(401).json({ message: "Unauthorised access..." });
+            return res.status(404).json({ message: "user not found" });
         }
 
         const verificationCheck = await client.verify.v2
@@ -113,7 +113,7 @@ export async function createUser(req, res) {
         }
     })
 
-    return res.status(200).json({ message: 'user created successfully ! and assigned as simple user ...' });
+    return res.status(201).json({ message: 'user created successfully ! and assigned as simple user ...' });
 };
 
 export async function deleteUser(req, res , next) {

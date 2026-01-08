@@ -9,7 +9,7 @@ export const checkForAuthenticationCookie = (cookieName) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
       } catch (err) {
-        console.error('Cookie token verification error:', err.message);
+        return res.status(401).json({ message: "Invalid or expired authentication token" });
       }
     }
     next();

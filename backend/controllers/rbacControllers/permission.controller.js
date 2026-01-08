@@ -55,7 +55,7 @@ export async function assignPermission(req, res, next) {
         }
       });
     } else {
-      return res.status(200).json({ message: "Permission already exitns ..." });
+      return res.status(409).json({ message: "Permission already exitns ..." });
     }
 
     req.objectId = permissionUser.id;
@@ -69,7 +69,7 @@ export async function assignPermission(req, res, next) {
 }
 
 
-export async function deAssignPermission(req, res) {
+export async function deAssignPermission(req, res, next) {
   try {
     const { roleName, tableName, operationName } = req.body;
 
@@ -104,7 +104,7 @@ export async function deAssignPermission(req, res) {
     });
 
     if (!permissionUser || permissionUser.isDeleted)
-      return res.status(409).json({ message: "This permission does not exists!" });
+      return res.status(404).json({ message: "This permission does not exists!" });
 
     await prisma.rolePermission.update({
       where: {
@@ -119,9 +119,10 @@ export async function deAssignPermission(req, res) {
       }
     });
     
-    req.objectId = permissionUser;
+    req.objectId = permissionUser.id;
 
     res.json({ message: "Permission taken ..." });
+    next();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

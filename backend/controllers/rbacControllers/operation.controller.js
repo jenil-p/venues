@@ -10,7 +10,7 @@ export async function createOperation(req, res , next) {
             }
         });
 
-        if (exists) return res.status(400).json({ message: "Operation exists" });
+        if (exists) return res.status(409).json({ message: "Operation exists" });
 
         const op = await prisma.operation.create({
             data: {

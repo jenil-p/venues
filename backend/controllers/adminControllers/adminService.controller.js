@@ -10,8 +10,12 @@ export async function approveService(req, res, next) {
             }
         })
 
-        if (!service || service.status === "ACTIVE") {
-            return res.status(404).json({ message: "invalid service approval request!" });
+        if(!service){
+            return res.status(404).json({ message: "service not found" })
+        }
+
+        if (service.status === "ACTIVE") {
+            return res.status(409).json({ message: "invalid service approval request!" });
         }
 
         await prisma.service.update({
@@ -29,7 +33,7 @@ export async function approveService(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error approving service" });
+        return res.status(500).json({ message: "error approving service" });
     }
 }
 
@@ -44,8 +48,12 @@ export async function rejectService(req, res, next) {
             }
         })
 
-        if (!service || service.status === "BLOCKED") {
-            return res.status(404).json({ message: "invalid service approval request!" });
+        if(!service){
+            return res.status(404).json({ message: "service not found" })
+        }
+
+        if (service.status === "BLOCKED") {
+            return res.status(409).json({ message: "invalid service approval request!" });
         }
 
         await prisma.service.update({
@@ -63,7 +71,7 @@ export async function rejectService(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error rejecting service" });
+        return res.status(500).json({ message: "error rejecting service" });
     }
 }
 
@@ -76,7 +84,7 @@ export async function getAllServices(req, res, next) {
         next();
     }
     catch (err) {
-        return res.status(400).json({ message: "error fatching services." });
+        return res.status(500).json({ message: "error fatching services." });
     }
 }
 
@@ -97,7 +105,7 @@ export async function getService(req, res, next) {
         })
 
         if(!service){
-            return res.status(400).json({ message: "service not found." });
+            return res.status(404).json({ message: "service not found." });
         }
 
         req.objectId = service.id;
@@ -105,7 +113,7 @@ export async function getService(req, res, next) {
         res.status(200).json({ service });
         next();
     } catch (err) {
-        return res.status(400).json({ message: "failed getting service" });
+        return res.status(500).json({ message: "failed getting service" });
     }
 }
 
@@ -121,7 +129,7 @@ export async function deleteService(req, res, next) {
         })
 
         if(!service){
-            return res.status(400).json({ message: "service not found." });
+            return res.status(404).json({ message: "service not found." });
         }
 
         if(service.status === "DELETED"){
@@ -142,6 +150,6 @@ export async function deleteService(req, res, next) {
         res.status(200).json({message: "service deleted successfully.", service });
         next();
     } catch (err) {
-        return res.status(400).json({ message: "failed deleting service" });
+        return res.status(500).json({ message: "failed deleting service" });
     }
 }
