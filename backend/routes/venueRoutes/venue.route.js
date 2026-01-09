@@ -22,6 +22,6 @@ router.put('/:venueId/photos/reorder', hasPermission("VenuePhoto" , "UPDATE"), v
 
 router.put('/:venueId/pricing', hasPermission("VenuePricingRule" , "UPDATE"), validateProviderVenueOwnership, setPricing);
 
-router.put('/:venueId/submit', hasPermission("Venue" , "UPDATE"), validateProviderVenueOwnership, submitVenue);
+router.put('/:venueId/status', hasPermission("Venue" , "UPDATE"), validateProviderVenueOwnership, submitVenue);
 
 export default router;

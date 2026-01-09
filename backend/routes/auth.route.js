@@ -8,13 +8,13 @@ const router = express.Router();
 
 router.post('/signup' , createUser);
 
-router.post('/send-otp' , sendOtp);
-router.post("/verify-otp", verifyOtp);
+router.post('/otp' , sendOtp);
+router.post("/otp/verify", verifyOtp);
 
 router.get('/logout' , logOutHelper);
 
-router.get('/get-user' , checkForAuthenticationCookie("token") , getUser);
+router.get('/me' , checkForAuthenticationCookie("token") , getUser);
 
-router.delete('/delete-user/:userId' , checkForAuthenticationCookie("token") , hasPermission("User" , "DELETE") , deleteUser , logAction("User" , "DELETE" , "userId"));
+router.delete('/:userId' , checkForAuthenticationCookie("token") , hasPermission("User" , "DELETE") , deleteUser , logAction("User" , "DELETE" , "userId"));
 
 export default router;

@@ -6,8 +6,9 @@ import { logAction } from "../../middlewares/actionlog.middleware.js"
 
 const router = express.Router();
 
-router.post('/add-role', checkForAuthenticationCookie("token"), hasPermission("Role", "CREATE"), addRole, logAction("Role", "CREATE"));
+router.post("/", checkForAuthenticationCookie("token"), hasPermission("Role", "CREATE"), addRole, logAction("Role", "CREATE"));
 
-router.delete('/delete-role/:roleId', checkForAuthenticationCookie("token"), hasPermission("Role", "DELETE"), deleteRole, logAction("Role", "DELETE", "roleId"));
+router.delete("/:roleId", checkForAuthenticationCookie("token"), hasPermission("Role", "DELETE"), deleteRole, logAction("Role", "DELETE"));
+
 
 export default router;

@@ -10,14 +10,15 @@ const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
-router.post( "/service-req/:serviceId/approve", hasPermission("Service", "APPROVE"), approveService, logAction("Service", "APPROVE"));
+router.patch("/:serviceId/approval", hasPermission("Service", "APPROVE"), approveService, logAction("Service", "APPROVE"));
 
-router.post( "/service-req/:serviceId/reject", hasPermission("Service", "REJECT"), rejectService, logAction("Service", "REJECT"));
+router.delete("/:serviceId/approval", hasPermission("Service", "REJECT"), rejectService, logAction("Service", "REJECT"));
 
-router.get("/services" , hasPermission("Service", "VIEW_ALL"), getAllServices, logAction("Service", "VIEW_ALL"))
+router.get("/", hasPermission("Service", "VIEW_ALL"), getAllServices, logAction("Service", "VIEW_ALL"));
 
-router.get("/:serviceId" , hasPermission("Service" , "READ"), getService, logAction("Service" , "READ"));
+router.get("/:serviceId", hasPermission("Service", "READ"), getService, logAction("Service", "READ"));
 
-router.delete("/:serviceId" , hasPermission("Service" , "READ"), deleteService, logAction("Service" , "DELETE"));
+router.delete("/:serviceId", hasPermission("Service", "DELETE"), deleteService, logAction("Service", "DELETE"));
+
 
 export default router;

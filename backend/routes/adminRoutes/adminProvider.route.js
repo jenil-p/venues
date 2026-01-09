@@ -10,14 +10,15 @@ const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
-router.post( "/provider-requests/:id/approve", hasPermission("ProviderProfile", "APPROVE"), approveProvider, logAction("ProviderProfile", "APPROVE"));
+router.patch("/:providerId/approval", hasPermission("ProviderProfile", "APPROVE"), approveProvider, logAction("ProviderProfile", "APPROVE"));
 
-router.post( "/provider-requests/:id/reject", hasPermission("ProviderProfile", "REJECT"), rejectProvider, logAction("ProviderProfile", "REJECT"));
+router.delete("/:providerId/approval", hasPermission("ProviderProfile", "REJECT"), rejectProvider, logAction("ProviderProfile", "REJECT"));
 
-router.get("/get-all-providers" , hasPermission("ProviderProfile", "VIEW_ALL"), getAllProvider, logAction("ProviderProfile", "VIEW_ALL"))
+router.get("/", hasPermission("ProviderProfile", "VIEW_ALL"), getAllProvider, logAction("ProviderProfile", "VIEW_ALL"));
 
-router.get("/:providerId" , hasPermission("ProviderProfile" , "READ"), getProvider, logAction("ProviderProfile" , "READ"));
+router.get("/:providerId", hasPermission("ProviderProfile", "READ"), getProvider, logAction("ProviderProfile", "READ"));
 
-router.delete("/:providerId" , hasPermission("ProviderProfile" , "DELETE"), deleteProvider, logAction("ProviderProfile" , "DELETE"));
+router.delete("/:providerId", hasPermission("ProviderProfile", "DELETE"), deleteProvider, logAction("ProviderProfile", "DELETE"));
+
 
 export default router;

@@ -10,8 +10,8 @@ const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
-router.post('/list' , hasPermission("Service" , "CREATE") , listService);
+router.post('/' , hasPermission("Service" , "CREATE") , listService);
 
-router.patch('/:serviceId/update' , hasPermission("Service", "UPDATE"), validateProviderServiceOwnership, updateService);
+router.patch('/:serviceId/' , hasPermission("Service", "UPDATE"), validateProviderServiceOwnership, updateService);
 
 export default router;

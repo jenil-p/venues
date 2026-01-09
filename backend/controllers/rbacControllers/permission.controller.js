@@ -2,33 +2,14 @@ import prisma from "../../prisma/client.js";
 
 export async function assignPermission(req, res, next) {
   try {
-    const { roleName, tableName, operationName } = req.body;
-
-    const role = await prisma.role.findUnique({
-      where: {
-        rolename: roleName
-      }
-    });
-    const table = await prisma.appTable.findUnique({
-      where: {
-        tablename: tableName
-      }
-    });
-    const op = await prisma.operation.findUnique({
-      where: {
-        operationname: operationName
-      }
-    });
-
-    if (!role || !table || !op)
-      return res.status(404).json({ message: "Role/Table/Operation missing" });
+    const { roleId, tableId, operationId } = req.params;
 
     let permissionUser = await prisma.rolePermission.findUnique({
       where: {
         roleId_tableId_operationId: {
-          roleId: role.id,
-          tableId: table.id,
-          operationId: op.id
+          roleId,
+          tableId,
+          operationId
         }
       }
     });
@@ -36,18 +17,18 @@ export async function assignPermission(req, res, next) {
     if (!permissionUser) {
       permissionUser = await prisma.rolePermission.create({
         data: {
-          roleId: role.id,
-          tableId: table.id,
-          operationId: op.id
+          roleId,
+          tableId,
+          operationId
         }
       });
     } else if (permissionUser.isDeleted) {
       await prisma.rolePermission.update({
         where: {
           roleId_tableId_operationId: {
-            roleId: role.id,
-            tableId: table.id,
-            operationId: op.id
+            roleId,
+            tableId,
+            operationId
           }
         },
         data: {
@@ -71,34 +52,14 @@ export async function assignPermission(req, res, next) {
 
 export async function deAssignPermission(req, res, next) {
   try {
-    const { roleName, tableName, operationName } = req.body;
-
-    const role = await prisma.role.findUnique({
-      where: {
-        rolename: roleName
-      }
-    });
-    const table = await prisma.appTable.findUnique({
-      where: {
-        tablename: tableName
-      }
-    });
-    const op = await prisma.operation.findUnique({
-      where: {
-        operationname: operationName
-
-      }
-    });
-
-    if (!role || !table || !op)
-      return res.status(404).json({ message: "Role/Table/Operation missing" });
+    const { roleId, tableId, operationId } = req.body;
 
     const permissionUser = await prisma.rolePermission.findUnique({
       where: {
         roleId_tableId_operationId: {
-          roleId: role.id,
-          tableId: table.id,
-          operationId: op.id
+          roleId,
+          tableId,
+          operationId,
         }
       }
     });
@@ -109,9 +70,9 @@ export async function deAssignPermission(req, res, next) {
     await prisma.rolePermission.update({
       where: {
         roleId_tableId_operationId: {
-          roleId: role.id,
-          tableId: table.id,
-          operationId: op.id
+          roleId,
+          tableId,
+          operationId,
         }
       },
       data: {

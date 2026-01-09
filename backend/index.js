@@ -43,28 +43,27 @@ app.use(
 );
 
 // general
-app.use('/auth' , authRoutes);
-app.use('/admin/role' , roleRoutes);
+app.use('/api/v1/auth' , authRoutes);
+app.use('/api/v1/roles' , roleRoutes);
 
 // admin functionalities
-app.use('/admin/userrole' , assignRoutes);
+app.use('/api/v1/users' , assignRoutes);
 
 // RBAC (admin)
-app.use('/admin/table' , apptableRoutes);
-app.use('/admin/operation', operationRoutes);
-app.use('/admin/permission' , permissionRoutes);
+app.use('/api/v1/admin/tables' , apptableRoutes);
+app.use('/api/v1/admin/operations', operationRoutes);
+app.use('/api/v1/admin/roles' , permissionRoutes);
 
-app.use('/provider' , providerRoutes);
+app.use('/api/v1/providers' , providerRoutes);
 
-app.use('/provider/venue', listvenueRoutes); // first time listing 
-app.use('/provider/venue', updatevenueRoutes); // updating its details ...
+app.use('/api/v1/providers/venues', listvenueRoutes); // first time listing 
+app.use('/api/v1/providers/venues', updatevenueRoutes); // updating its details ...
 
-app.use('/provider/service', listserviceRoutes); // first time listing 
+app.use('/api/v1/providers/services', listserviceRoutes); // first time listing 
 
-app.use('/admin/provider' , adminProviderRoutes);
-
-app.use('/admin/venue', adminvenueRoutes);
-app.use('/admin/service', adminserviceRoutes);
+app.use('/api/v1/admin/providers' , adminProviderRoutes);
+app.use('/api/v1/admin/venues', adminvenueRoutes);
+app.use('/api/v1/admin/services', adminserviceRoutes);
 
 // temp
 import tempRoutes from './routes/dlogin.route.js';

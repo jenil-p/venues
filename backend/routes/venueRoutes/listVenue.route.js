@@ -7,6 +7,6 @@ import { listVenue } from '../../controllers/venueControllers/listVenue.controll
 
 const router = express.Router();
 
-router.post('/list' , checkForAuthenticationCookie("token") , hasPermission("Venue" , "CREATE") , listVenue);
+router.post('/' , checkForAuthenticationCookie("token") , hasPermission("Venue" , "CREATE") , listVenue);
 
 export default router;

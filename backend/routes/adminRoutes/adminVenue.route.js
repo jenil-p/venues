@@ -10,14 +10,15 @@ const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
-router.post( "/venue-req/:venueId/approve", hasPermission("Venue", "APPROVE"), approveVenue, logAction("Venue", "APPROVE"));
+router.patch("/:venueId/approval", hasPermission("Venue", "APPROVE"), approveVenue, logAction("Venue", "APPROVE"));
 
-router.post( "/venue-req/:venueId/reject", hasPermission("Venue", "REJECT"), rejectVenue, logAction("Venue", "REJECT"));
+router.delete("/:venueId/approval", hasPermission("Venue", "REJECT"), rejectVenue, logAction("Venue", "REJECT"));
 
-router.get("/venues" , hasPermission("Venue", "VIEW_ALL"), getAllVenues, logAction("Venue", "VIEW_ALL"))
+router.get("/", hasPermission("Venue", "VIEW_ALL"), getAllVenues, logAction("Venue", "VIEW_ALL"));
 
-router.get("/:venueId" , hasPermission("Venue" , "READ"), getVenue, logAction("Venue" , "READ"));
+router.get("/:venueId", hasPermission("Venue", "READ"), getVenue, logAction("Venue", "READ"));
 
-router.delete("/:venueId" , hasPermission("Venue" , "READ"), deleteVenue, logAction("Venue" , "DELETE"));
+router.delete("/:venueId", hasPermission("Venue", "DELETE"), deleteVenue, logAction("Venue", "DELETE"));
+
 
 export default router;

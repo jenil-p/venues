@@ -4,7 +4,7 @@ import { requestProvider, myProviderProfile } from '../../controllers/providerCo
 
 const router = express.Router();
 
-router.post("/request", checkForAuthenticationCookie("token"), requestProvider);
-router.get("/request/me", checkForAuthenticationCookie("token"), myProviderProfile);
+router.post("/", checkForAuthenticationCookie("token"), requestProvider);
+router.get("/me", checkForAuthenticationCookie("token"), myProviderProfile);
 
 export default router;

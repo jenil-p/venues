@@ -6,6 +6,6 @@ import { logAction } from "../../middlewares/actionlog.middleware.js";
 
 const router = express.Router();
 
-router.post("/add-table", checkForAuthenticationCookie("token"), hasPermission("AppTable", "CREATE"), createAppTable, logAction("AppTable", "CREATE"));
+router.post("/", checkForAuthenticationCookie("token"), hasPermission("AppTable", "CREATE"), createAppTable, logAction("AppTable", "CREATE"));
 
 export default router;
