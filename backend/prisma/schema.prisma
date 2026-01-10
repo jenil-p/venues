@@ -79,7 +79,7 @@ enum PriceUnit {
   DAILY
 }
 
-enum ProviderStatus  {
+enum ProviderStatus {
   DRAFT
   PENDING
   APPROVED
@@ -120,14 +120,17 @@ enum PaymentStatus {
 
 // ----------------------- VENUE -----------------------
 model Venue {
-  id             Int         @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   venuename      String
   description    String
   capacity       Int
   contactemail   String
   contactnumber1 String
   contactnumber2 String?
-  status         VenueStatus @default(DRAFT)
+
+  rating Int @default(0)
+
+  status VenueStatus @default(DRAFT)
 
   providerId Int
   provider   ProviderProfile @relation(fields: [providerId], references: [id])
@@ -488,15 +491,15 @@ model Wishlist {
 
 // ----------------------- PROVIDER -----------------------
 model ProviderProfile {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @unique
-  legalname    String
-  contact1     String
-  contact2     String?
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  legalname   String
+  contact1    String
+  contact2    String?
   dateOfBirth DateTime
-  idProof      String
-  photo        String
-  addressId    Int
+  idProof     String
+  photo       String
+  addressId   Int
 
   status ProviderStatus @default(DRAFT)
 
