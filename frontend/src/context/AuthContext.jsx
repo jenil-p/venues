@@ -20,8 +20,13 @@ export const AuthProvider = ({ children }) => {
     authService
       .getMe()
       .then((res) => {
-        setUser(res);
-        setAuthStatus("logged_in");
+        setUser(res.user);
+        console.log("res..." , res.user);
+        if(!res.user){
+          setAuthStatus("guest")
+        }else{
+          setAuthStatus("logged_in");
+        }
       })
       .catch(() => {
         setUser(null);

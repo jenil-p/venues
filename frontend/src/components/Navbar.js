@@ -11,6 +11,8 @@ import AuthModal from "./auth/AuthModal";
 const Navbar = () => {
   let { authStatus, user, logout } = useAuth();
 
+  console.log(authStatus , user)
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAuth, setOpenAuth] = useState(false);
   const menuRef = useRef(null);
