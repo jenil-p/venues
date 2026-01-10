@@ -1,10 +1,10 @@
 import express from 'express';
 
-import { checkForAuthenticationCookie } from "../../middlewares/authentication.middleware.js";
-import { hasPermission } from "../../middlewares/permission.middleware.js";
-import { validateProviderVenueOwnership } from "../../middlewares/validateProviderVenueOwnership.middleware.js"
+import { checkForAuthenticationCookie } from "../../../middlewares/authentication.middleware.js";
+import { hasPermission } from "../../../middlewares/permission.middleware.js";
+import { validateProviderVenueOwnership } from "../../../middlewares/validateProviderVenueOwnership.middleware.js"
 
-import { updateVenue, setVenueType, setVenueFeatures, addVenuePhotos, reorderPhotos, setPricing, submitVenue } from '../../controllers/venueControllers/venue.controller.js';
+import { updateVenue, setVenueType, setVenueFeatures, addVenuePhotos, reorderPhotos, setPricing, submitVenue } from '../../../controllers/providerControllers/venueControllers/venue.controller.js';
 
 const router = express.Router();
 

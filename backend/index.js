@@ -21,10 +21,12 @@ import adminProviderRoutes from './routes/adminRoutes/adminProvider.route.js';
 import adminvenueRoutes from './routes/adminRoutes/adminVenue.route.js';
 import adminserviceRoutes from './routes/adminRoutes/adminService.route.js';
 
-import listvenueRoutes from './routes/venueRoutes/listVenue.route.js';
-import updatevenueRoutes from './routes/venueRoutes/venue.route.js';
+import listvenueRoutes from './routes/providerRoutes/venueRoutes/listVenue.route.js';
+import updatevenueRoutes from './routes/providerRoutes/venueRoutes/venue.route.js';
 
-import listserviceRoutes from './routes/serviceRoutes/listService.route.js';
+import listserviceRoutes from './routes/providerRoutes/serviceRoutes/listService.route.js';
+
+import uservenueRoutes from './routes/userRoutes/venue.routes.js'
 
 const app = express();
 const PORT = process.env.PORT;
@@ -65,8 +67,6 @@ app.use('/api/v1/admin/providers' , adminProviderRoutes);
 app.use('/api/v1/admin/venues', adminvenueRoutes);
 app.use('/api/v1/admin/services', adminserviceRoutes);
 
-// temp
-import tempRoutes from './routes/dlogin.route.js';
-app.use('/d/login', tempRoutes);
+app.use('/api/v1/venues', uservenueRoutes);
 
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
