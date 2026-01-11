@@ -128,7 +128,7 @@ model Venue {
   contactnumber1 String
   contactnumber2 String?
 
-  rating Int @default(0)
+  rating Float @default(0)
 
   status VenueStatus @default(DRAFT)
 
