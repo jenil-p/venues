@@ -1,151 +1,118 @@
 "use client";
-
 import React, { useEffect, useState, useRef } from "react";
 import { IoIosMenu } from "react-icons/io";
+import { FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AuthModal from "./auth/AuthModal";
 
 const Navbar = () => {
-  let { authStatus, user, logout } = useAuth();
-
+  const { authStatus, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAuth, setOpenAuth] = useState(false);
   const menuRef = useRef(null);
+  const router = useRouter();
 
+  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleBecomeHost = () => {
+    if (authStatus === "logged_in") {
+      router.push("/host/join");
+    } else {
+      setOpenAuth(true); // Force login if they click "Become a Host"
+    }
+  };
+
   return (
-    <div className="Navbar-font w-full fixed top-0 z-50 flex justify-between items-center py-3 px-20 select-none">
-      {/* Logo */}
-      <div className="logo font-bold text-2xl">
-        <Link href="/">Logo</Link>
-      </div>
+    <>
+      <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 transition-all duration-300">
+        <div className="max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4">
+          <div className="flex flex-row items-center justify-between gap-3 md:gap-0 h-20">
+            
+            {/* Logo */}
+            <Link href="/" className="cursor-pointer">
+              <h1 className="text-rose-500 font-bold text-2xl">VenueFinder</h1>
+            </Link>
 
-      {/* Center Menu */}
-      <div className="menu-items">
-        <ul className="flex justify-center items-center gap-10">
-          <li>
-            <Link href="/properties">Find Venue</Link>
-          </li>
-          <li>Events & Inspirations</li>
-          <li>Booking Guide</li>
-          <li>
-            <Link href="/host/hostingform">Become a Host</Link>
-          </li>
-        </ul>
-      </div>
+            {/* Middle Menu (Hidden on mobile) */}
+            <div className="hidden md:block">
+              <ul className="flex items-center gap-8 text-sm font-medium text-gray-600">
+                <li className="hover:text-black transition cursor-pointer">
+                    <Link href="/properties">Find Venue</Link>
+                </li>
+                <li className="hover:text-black transition cursor-pointer">Inspirations</li>
+                <li className="hover:text-black transition cursor-pointer">Booking Guide</li>
+              </ul>
+            </div>
 
-      {/* Right User Menu */}
-      <div className="relative" ref={menuRef}>
-        <div
-          className="user backdrop-blur-sm rounded-full px-1 py-0.5 flex justify-center items-center gap-2 cursor-pointer"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <IoIosMenu className="w-5 h-auto" />
-          <img
-            src="/user.png"
-            alt="User"
-            className="w-6 h-auto rounded-full"
-          />
+            {/* Right Section */}
+            <div className="flex items-center gap-4 relative" ref={menuRef}>
+              
+              {/* Become a Host Button (Distinct Style) */}
+              <div 
+                onClick={handleBecomeHost}
+                className="hidden md:block text-sm font-semibold py-2 px-4 rounded-full hover:bg-gray-100 transition cursor-pointer"
+              >
+                Become a Host
+              </div>
+
+              {/* User Menu Dropdown Trigger */}
+              <div 
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="p-1 md:py-1 md:px-2 border border-gray-300 rounded-full flex items-center gap-3 cursor-pointer hover:shadow-md transition duration-300 bg-white"
+              >
+                <IoIosMenu className="text-xl ml-1" />
+                <div className="hidden md:block">
+                   {/* Fallback to Icon if no photo */}
+                   {user?.photo ? (
+                      <img src={user.photo} alt="user" className="rounded-full h-8 w-8 object-cover" />
+                   ) : (
+                      <FaUserCircle className="h-8 w-8 text-gray-500" />
+                   )}
+                </div>
+              </div>
+
+              {/* Dropdown Menu */}
+              {menuOpen && (
+                <div className="absolute rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] w-[200px] bg-white overflow-hidden right-0 top-12 text-sm z-50 animate-in fade-in zoom-in duration-200">
+                  <div className="flex flex-col cursor-pointer">
+                    
+                    {authStatus === "logged_in" ? (
+                      <>
+                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
+                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
+                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>
+                         <hr />
+                         <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={logout}>Logout</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => { setOpenAuth(true); setMenuOpen(false); }}>Login</div>
+                        <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={() => { setOpenAuth(true); setMenuOpen(false); }}>Sign up</div>
+                      </>
+                    )}
+                    
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-
-        {/* ================= GUEST MENU ================= */}
-        {menuOpen && authStatus === "guest" && (
-          <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg p-3 flex flex-col text-[#484848]">
-            <button
-              className="text-sm font-inter font-semibold hover:bg-gray-100 rounded-md px-3 py-1 text-left"
-              onClick={() => {
-                setOpenAuth(true);
-                setMenuOpen(false);
-              }}
-            >
-              Login
-            </button>
-
-            <button
-              className="text-sm font-inter hover:bg-gray-100 rounded-md px-3 py-1 text-left"
-              onClick={() => {
-                setOpenAuth(true);
-                setMenuOpen(false);
-              }}
-            >
-              Signup
-            </button>
-
-            <button className="text-sm font-inter hover:bg-gray-100 rounded-md px-3 py-1 text-left">
-              Help Center
-            </button>
-          </div>
-        )}
-
-        {/* ================= LOGGED-IN MENU ================= */}
-        {menuOpen && authStatus === "logged_in" && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg p-3 flex flex-col">
-            <div className="flex flex-col text-[#484848]">
-              <Link
-                href="/messages"
-                className="text-sm hover:bg-gray-100 rounded-md px-2 py-1"
-              >
-                Messages
-              </Link>
-              <Link
-                href="/notifications"
-                className="text-sm hover:bg-gray-100 rounded-md px-2 py-1"
-              >
-                Notifications
-              </Link>
-              <Link
-                href="/reservations"
-                className="text-sm hover:bg-gray-100 rounded-md px-2 py-1"
-              >
-                Reservations
-              </Link>
-              <Link
-                href="/bookmarks"
-                className="text-sm hover:bg-gray-100 rounded-md px-2 py-1"
-              >
-                Bookmarks
-              </Link>
-            </div>
-
-            <div className="bg-[#9A9A9A] h-px w-full my-2" />
-
-            <div className="flex flex-col text-xs text-[#484848]">
-              <button className="hover:bg-gray-100 rounded-md px-2 py-1 text-left">
-                Account
-              </button>
-              <button className="hover:bg-gray-100 rounded-md px-2 py-1 text-left">
-                Help Center
-              </button>
-              <button
-                onClick={logout}
-                className="hover:bg-gray-100 rounded-md px-2 py-1 text-left"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-
-        <AuthModal
-          open={openAuth}
-          onClose={() => setOpenAuth(false)}
-        />
-      </div>
-    </div>
+      </nav>
+      
+      {/* Auth Modal Trigger */}
+      <AuthModal open={openAuth} onClose={() => setOpenAuth(false)} />
+    </>
   );
 };
 

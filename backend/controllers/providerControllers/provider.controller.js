@@ -4,21 +4,33 @@ export async function requestProvider(req, res) {
   try {
     const userId = req.user.id;
 
-    const { legalname, contact1, contact2, dateOfBirth, idProof, photo, addressId } = req.body;
+    const { legalname, contact1, contact2, dateOfBirth, idProof, photo, address } = req.body;
 
-    if (!legalname || !contact1 || !dateOfBirth || !idProof || !addressId) {
+    if (!legalname || !contact1 || !dateOfBirth || !idProof || !address) {
       return res.status(400).json({ message: "Required fields missing" });
     }
+
+    const madeAddress = await prisma.address.create({
+      data:{
+        latitude: 0.00,
+        longitude: 0.00,
+        location: address.location,
+        postalcode: Number(address.postalcode),
+        cityId: Number(address.cityId),
+      }
+    })
 
     const existingProfile = await prisma.providerProfile.findUnique({
       where: { userId }
     });
 
     if (existingProfile && existingProfile.status === "APPROVED") {
+      console.log("You are already a verified provider")
       return res.status(409).json({ message: "You are already a verified provider" });
     }
 
     if (existingProfile && existingProfile.status === "PENDING") {
+      console.log("Provider request already submitted")
       return res.status(409).json({ message: "Provider request already submitted" });
     }
 
@@ -32,7 +44,7 @@ export async function requestProvider(req, res) {
           dateOfBirth: new Date(dateOfBirth),
           idProof,
           photo,
-          addressId,
+          addressId: madeAddress.id,
           status: "PENDING"
         }
       });
@@ -51,7 +63,7 @@ export async function requestProvider(req, res) {
         dateOfBirth: new Date(dateOfBirth),
         idProof,
         photo,
-        addressId,
+        addressId: madeAddress.id,
         status: "PENDING"
       }
     });

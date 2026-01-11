@@ -41,7 +41,6 @@ const PropertyPage = async ({ params }) => {
   
   const price = venue.pricing?.[0]?.price || 0;
   const features = venue.features || [];
-  console.log(features);
 
   return (
     <div className="bg-white min-h-screen">
