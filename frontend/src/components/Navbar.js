@@ -7,10 +7,13 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AuthModal from "./auth/AuthModal";
 
+import { authService } from "@/api/auth.service";
+
 const Navbar = () => {
   const { authStatus, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAuth, setOpenAuth] = useState(false);
+  const [role, setRole] = useState("USER");
   const menuRef = useRef(null);
   const router = useRouter();
 
@@ -25,11 +28,24 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    async function setRolefun() {
+      const isAdmin = await authService.checkIfAdmin();
+      const isProvider = await authService.checkIfProvider();
+      if (isAdmin.isAdmin == true) {
+        setRole("ADMIN")
+      } else if (isProvider.isProvider == true) {
+        setRole("PROVIDER")
+      }
+    }
+    setRolefun();
+  }, []);
+
   const handleBecomeHost = () => {
     if (authStatus === "logged_in") {
       router.push("/host/join");
     } else {
-      setOpenAuth(true); // Force login if they click "Become a Host"
+      setOpenAuth(true);
     }
   };
 
@@ -38,7 +54,7 @@ const Navbar = () => {
       <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 transition-all duration-300">
         <div className="max-w-[2520px] mx-auto xl:px-20 md:px-10 sm:px-2 px-4">
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0 h-20">
-            
+
             {/* Logo */}
             <Link href="/" className="cursor-pointer">
               <h1 className="text-rose-500 font-bold text-2xl">VenueFinder</h1>
@@ -48,7 +64,7 @@ const Navbar = () => {
             <div className="hidden md:block">
               <ul className="flex items-center gap-8 text-sm font-medium text-gray-600">
                 <li className="hover:text-black transition cursor-pointer">
-                    <Link href="/properties">Find Venue</Link>
+                  <Link href="/properties">Find Venue</Link>
                 </li>
                 <li className="hover:text-black transition cursor-pointer">Inspirations</li>
                 <li className="hover:text-black transition cursor-pointer">Booking Guide</li>
@@ -57,28 +73,30 @@ const Navbar = () => {
 
             {/* Right Section */}
             <div className="flex items-center gap-4 relative" ref={menuRef}>
-              
+
               {/* Become a Host Button (Distinct Style) */}
-              <div 
-                onClick={handleBecomeHost}
-                className="hidden md:block text-sm font-semibold py-2 px-4 rounded-full hover:bg-gray-100 transition cursor-pointer"
-              >
-                Become a Host
-              </div>
+              {role === "USER" &&
+                <div
+                  onClick={handleBecomeHost}
+                  className="hidden md:block text-sm font-semibold py-2 px-4 rounded-full hover:bg-gray-100 transition cursor-pointer"
+                >
+                  Become a Host
+                </div>
+              }
 
               {/* User Menu Dropdown Trigger */}
-              <div 
+              <div
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="p-1 md:py-1 md:px-2 border border-gray-300 rounded-full flex items-center gap-3 cursor-pointer hover:shadow-md transition duration-300 bg-white"
               >
                 <IoIosMenu className="text-xl ml-1" />
                 <div className="hidden md:block">
-                   {/* Fallback to Icon if no photo */}
-                   {user?.photo ? (
-                      <img src={user.photo} alt="user" className="rounded-full h-8 w-8 object-cover" />
-                   ) : (
-                      <FaUserCircle className="h-8 w-8 text-gray-500" />
-                   )}
+                  {/* Fallback to Icon if no photo */}
+                  {user?.photo ? (
+                    <img src={user.photo} alt="user" className="rounded-full h-8 w-8 object-cover" />
+                  ) : (
+                    <FaUserCircle className="h-8 w-8 text-gray-500" />
+                  )}
                 </div>
               </div>
 
@@ -86,14 +104,14 @@ const Navbar = () => {
               {menuOpen && (
                 <div className="absolute rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] w-[200px] bg-white overflow-hidden right-0 top-12 text-sm z-50 animate-in fade-in zoom-in duration-200">
                   <div className="flex flex-col cursor-pointer">
-                    
+
                     {authStatus === "logged_in" ? (
                       <>
-                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
-                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
-                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>
-                         <hr />
-                         <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={logout}>Logout</div>
+                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
+                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
+                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>
+                        <hr />
+                        <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={logout}>Logout</div>
                       </>
                     ) : (
                       <>
@@ -101,7 +119,7 @@ const Navbar = () => {
                         <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={() => { setOpenAuth(true); setMenuOpen(false); }}>Sign up</div>
                       </>
                     )}
-                    
+
                   </div>
                 </div>
               )}
@@ -109,7 +127,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      
+
       {/* Auth Modal Trigger */}
       <AuthModal open={openAuth} onClose={() => setOpenAuth(false)} />
     </>

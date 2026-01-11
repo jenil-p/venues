@@ -27,6 +27,8 @@ import updatevenueRoutes from './routes/providerRoutes/venueRoutes/venue.route.j
 import listserviceRoutes from './routes/providerRoutes/serviceRoutes/listService.route.js';
 
 import uservenueRoutes from './routes/userRoutes/venue.routes.js'
+import addressRoutes from './routes/address.route.js'
+import checkRoleRoutes from './routes/roleCheck.route.js'
 
 const app = express();
 const PORT = process.env.PORT;
@@ -68,5 +70,7 @@ app.use('/api/v1/admin/venues', adminvenueRoutes);
 app.use('/api/v1/admin/services', adminserviceRoutes);
 
 app.use('/api/v1/venues', uservenueRoutes);
+app.use('/api/v1/address' , addressRoutes);
+app.use('/api/v1/role' , checkRoleRoutes);
 
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
