@@ -1,223 +1,158 @@
-import React from 'react'
-
-import Navbar from '@/components/Navbar'
-import NearbyServices from '@/components/cards/NearbyServices';
-import ReserveCard from '@/components/cards/ReserveCard';
+import React from 'react';
+import Navbar from '@/components/Navbar';
 import FooterDiv from '@/components/Footer';
-import ReviewCard from '@/components/cards/ReviewCard';
+import VenueGallery from '@/components/venue/VenueGallery';
+import BookingWidget from '@/components/cards/BookingWidget';
 
-import { FaRegHeart } from "react-icons/fa";
-import { FiShare2 } from "react-icons/fi";
-import { IoBedOutline, IoCarOutline, IoPawOutline } from "react-icons/io5";
-import { PiBathtub } from "react-icons/pi";
+import { FaRegHeart, FaStar, FaShare, FaMapMarkerAlt } from "react-icons/fa";
+import { BsDoorOpen, BsShieldCheck } from "react-icons/bs";
+import { PiMedal } from "react-icons/pi";
 
-import { TbToolsKitchen } from "react-icons/tb";
-import { IoTvOutline, IoWifiOutline } from "react-icons/io5";
-import { IoIosSnow } from "react-icons/io";
-import { PiWashingMachineLight } from "react-icons/pi";
-import { MdBalcony } from "react-icons/md";
+import { venueService } from '@/api/venue.service';
 
-import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
-import { BsClipboardCheck } from "react-icons/bs";
+const getVenueData = async (id) => {
+  try {
+    const response = await venueService.getVenue(id);
+    return response.data; 
+  } catch (error) {
+    console.error("Failed to fetch venue", error);
+    return null;
+  }
+};
 
-import { FaArrowRight } from "react-icons/fa6";
+const PropertyPage = async ({ params }) => {
+  const resolvedParams = await params;
+  const venueId = Number(resolvedParams.propertyID);
 
+  const venue = await getVenueData(venueId);
 
-const page = ({ params }) => {
+  if (!venue) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-bold text-gray-500">Venue not found</h1>
+      </div>
+    );
+  }
+
+  const city = venue.address?.city?.name || "Unknown City";
+  const state = venue.address?.city?.state?.name || "Unknown State";
+  const country = venue.address?.city?.state?.country?.name || "India";
+  const formattedAddress = `${city}, ${state}, ${country}`;
+  
+  const price = venue.pricing?.[0]?.price || 0;
+  const features = venue.features || [];
+  console.log(features);
+
   return (
-    <>
+    <div className="bg-white min-h-screen">
       <Navbar />
 
-      <div className="result-page py-20">
-        <div className='image-section xl:h-[600px] max-xl:h-[500px] p-10 w-full flex justify-center items-center gap-4'>
-          <div className="title-image w-1/2 h-full bg-[#C2C6CC] rounded-2xl"></div>
-          <div className="other-images w-1/2 h-full flex flex-col justify-center items-center box-border gap-4">
-            <div className='flex h-1/2 w-full gap-4'>
-              <div className="image2 bg-[#C2C6CC] w-1/2 h-full rounded-lg"></div>
-              <div className="image2 bg-[#C2C6CC] w-1/2 h-full rounded-lg"></div>
+      <main className="max-w-7xl mx-auto mt-10 px-6 py-6 sm:px-8 lg:px-12">
+        
+        <div className="mb-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            {venue.venuename}
+          </h1>
+          <div className="flex justify-between items-center text-sm md:text-base">
+            <div className="flex items-center gap-2 font-medium underline cursor-pointer">
+              <FaStar className="text-black" />
+              <span>{venue.rating ? venue.rating.toFixed(1) : "New"}</span>
+              <span className="text-gray-600 no-underline mx-1">·</span>
+              <span className="text-gray-800 underline">{venue.reviews?.length || 0} reviews</span>
+              <span className="text-gray-600 no-underline mx-1">·</span>
+              <span className="text-gray-600">{formattedAddress}</span>
             </div>
-            <div className='flex h-1/2 w-full gap-4'>
-              <div className="image2 bg-[#C2C6CC] w-1/2 h-full rounded-lg"></div>
-              <div className="image2 bg-[#C2C6CC] w-1/2 h-full rounded-lg flex justify-center items-center">
-                <div className="flex justify-center items-center gap-4">
-                  <div className="no-of-photoes semibold-x-big-gray">+2</div>
+            
+            <div className="flex gap-4">
+              <button className="flex items-center gap-2 hover:bg-gray-100 px-3 py-1.5 rounded-md transition font-medium underline">
+                <FaShare className="text-sm" /> Share
+              </button>
+              <button className="flex items-center gap-2 hover:bg-gray-100 px-3 py-1.5 rounded-md transition font-medium underline">
+                <FaRegHeart className="text-sm" /> Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <VenueGallery photos={venue.photos} />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-12 relative">
+          
+          <div className="md:col-span-2 flex flex-col gap-8">
+            
+            <div className="border-b pb-8">
+              <h2 className="text-xl font-semibold mb-1">Entire venue hosted by Provider</h2>
+              <p className="text-gray-500">
+                {venue.capacity} guests · {venue.address?.postalcode} Postal Code
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-6 border-b pb-8 text-gray-600">
+              <div className="flex gap-4 items-start">
+                <BsDoorOpen className="text-2xl text-gray-800 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Self check-in</h3>
+                  <p className="text-sm">Check yourself in with the lockbox.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <PiMedal className="text-2xl text-gray-800 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Great location</h3>
+                  <p className="text-sm">90% of recent guests gave the location a 5-star rating.</p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="detail-div flex justify-center items-center px-32 h-auto">
-        <div className='w-3/5 '>
-          <div className="address-like flex justify-between items-center">
-            <div className="text-area">
-              <p className='text-[#484848] font-inter text-3xl font-bold mb-1'>
-                Well Furnished Apartment
-              </p>
-              <p className='small-thin-gray font-inter'>
-                100 Smart Street, Gujarat, India.
-              </p>
+            <div className="border-b pb-8">
+               <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                 {venue.description}
+               </p>
+               <button className="mt-4 font-semibold underline flex items-center gap-1">
+                 Show more <span className="text-lg"></span>
+               </button>
             </div>
-            <div className="like-share flex justify-center items-center gap-4 text-4xl text-[#484848] font-bold">
-              <FaRegHeart />
-              <FiShare2 />
-            </div>
-          </div>
-          <div className="capacity-cards flex justify-between items-center py-10 w-full">
-            <div className='bg-[#EFF0F2] rounded-xl p-12 flex flex-col justify-center items-center font-bold text-6xl text-[#484848]'>
-              <IoBedOutline /> <p className='small-thin-dark'>0 Allowed</p>
-            </div>
-            <div className='bg-[#EFF0F2] rounded-xl p-12 flex flex-col justify-center items-center-10 font-bold text-6xl text-[#484848]'>
-              <PiBathtub /> <p className='small-thin-dark'>0 Allowed</p>
-            </div>
-            <div className='bg-[#EFF0F2] rounded-xl p-12 flex flex-col justify-center items-center font-bold text-6xl text-[#484848]'>
-              <IoCarOutline /> <p className='small-thin-dark'>0 Allowed</p>
-            </div>
-            <div className='bg-[#EFF0F2] rounded-xl p-12 flex flex-col justify-center items-center font-bold text-6xl text-[#484848]'>
-              <IoPawOutline /> <p className='small-thin-dark'>0 Allowed</p>
-            </div>
-          </div>
-          <div className="descroption py-5 space-y-4">
-            <p className="title semibold-big-gray">Apartment Description</p>
-            <p className='small-thin-gray'>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quo sunt dignissimos dolore aspernatur fugiat a, quidem omnis mollitia rem quas at illo amet, nemo perferendis sit? Enim saepe laudantium reiciendis veritatis molestias ducimus odio.
-            </p>
-            <p className='small-thin-gray'>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quo sunt dignissimos dolore aspernatur fugiat a, quidem omnis mollitia rem quas at illo amet, nemo perferendis sit? Enim saepe laudantium reiciendis veritatis molestias ducimus odio.
-            </p>
-          </div>
-        </div>
-        <div className='w-2/5 flex justify-center items-start h-full'>
-          <ReserveCard />
-        </div>
-      </div>
 
-      <div className='w-4/5 px-32 my-10 title'>
-        <p className='semibold-big-gray mb-7'>Offered Amenities</p>
-        <div className="w-full grid grid-cols-2 gap-4">
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <TbToolsKitchen className='w-7 h-auto' /> Kitchen
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <IoTvOutline className='w-7 h-auto' /> Television With Netflix
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <IoIosSnow className='w-7 h-auto' /> Air Conditioner
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <IoWifiOutline className='w-7 h-auto' /> Free Wireless Internet
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <PiWashingMachineLight className='w-7 h-auto' /> Washer
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <MdBalcony className='w-7 h-auto' /> Balcony
-          </div>
-        </div>
-        <div className="show-all my-7">
-          <button className='border rounded-md text-[#484848] flex justify-center items-center h-16 w-56'>Show All 10 Amenities</button>
-        </div>
-      </div>
+            <div className="border-b pb-8">
+              <h2 className="text-xl font-semibold mb-6">What this place offers</h2>
+              <div className="grid grid-cols-2 gap-y-4">
+                {features.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 text-gray-700">
+                    <BsShieldCheck className="text-xl" /> 
+                    <span>{item.feature?.name || "Amenity"}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <button className="mt-6 border border-black rounded-lg px-6 py-3 font-semibold hover:bg-gray-50 transition">
+                Show all {features.length} amenities
+              </button>
+            </div>
 
+          </div>
 
-      <div className='w-4/5 px-32 my-16 title '>
-        <p className='semibold-big-gray mb-7'>Safety & Hygiene</p>
-        <div className="w-full grid grid-cols-2 gap-4">
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <BsClipboardCheck className='w-7 h-auto' /> Daily Cleaning
+          <div className="md:col-span-1 relative">
+            <div className="sticky top-24 w-full">
+              <BookingWidget price={price} rating={venue.rating} />
+            </div>
           </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <BsClipboardCheck className='w-7 h-auto' /> Fire Extinguishers
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <BsClipboardCheck className='w-7 h-auto' /> Disinfections and Sterilizations
-          </div>
-          <div className='flex justify-start items-center text-[#484848] text-lg gap-5'>
-            <BsClipboardCheck className='w-7 h-auto' /> Smoke Detectors
-          </div>
-        </div>
-      </div>
-
-      <div className="map w-8/12 h-96 px-32 my-16">
-        <div className='border bg-[#EFF0F2] w-full h-full'>
 
         </div>
-      </div>
 
-      <div className="near-by w-4/5 px-32 my-16">
-        <p className='semibold-big-gray mb-7'>Nearby Services</p>
-        <div className="services-list relative flex justify-start items-center gap-4 w-10/12">
-          <div className="next-btn w-16 h-16 absolute -right-5 rounded-full flex justify-center items-center bg-[#9A9A9A] text-[#484848] text-2xl">
-            <FaArrowRight />
-          </div>
-          <NearbyServices />
-          <NearbyServices />
-          <NearbyServices />
+        <div className="py-12 border-t mt-12">
+            <h2 className="text-2xl font-semibold mb-6">Where you'll be</h2>
+            <div className="w-full h-[400px] bg-gray-200 rounded-xl flex items-center justify-center">
+                <p className="text-gray-500 flex items-center gap-2">
+                    <FaMapMarkerAlt /> {formattedAddress}
+                </p>
+            </div>
         </div>
-        <div className="btn mt-7">
-          <button className='w-44 h-14 flex justify-center items-center rounded-full bg-[#9A9A9A] text-white font-semibold'>Show On Map</button>
-        </div>
-      </div>
 
-      <div className="reviews w-4/5 px-32 mt-16 mb-24 title">
-        <div className='semibold-big-gray mb-7 flex justify-start items-center gap-2'>
-          <p>Reviews</p>
-          <FaStar />
-          <p>5.0</p>
-        </div>
-        <div className="w-9/12 grid grid-cols-2 gap-x-10 gap-y-3">
-          <div className='flex justify-between items-center text-[#484848] text-lg gap-5'>
-            <p>Amenities</p>
-            <div className='flex justify-center items-center gap-2'>
-              <div className="progress-bar w-32 bg-[#9A9A9A] h-1 rounded-full"></div>
-              <p>5.0</p>
-            </div>
-          </div>
-          <div className='flex justify-between items-center text-[#484848] text-lg gap-5'>
-            <p>Hygiene</p>
-            <div className='flex justify-center items-center gap-2'>
-              <div className="progress-bar w-32 bg-[#9A9A9A] h-1 rounded-full"></div>
-              <p>5.0</p>
-            </div>
-          </div>
-          <div className='flex justify-between items-center text-[#484848] text-lg gap-5'>
-            <p>Communication</p>
-            <div className='flex justify-center items-center gap-2'>
-              <div className="progress-bar w-32 bg-[#9A9A9A] h-1 rounded-full"></div>
-              <p>5.0</p>
-            </div>
-          </div>
-          <div className='flex justify-between items-center text-[#484848] text-lg gap-5'>
-            <p>Location</p>
-            <div className='flex justify-center items-center gap-2'>
-              <div className="progress-bar w-32 bg-[#9A9A9A] h-1 rounded-full"></div>
-              <p>5.0</p>
-            </div>
-          </div>
-          <div className='flex justify-between items-center text-[#484848] text-lg gap-5'>
-            <p>Value For Money</p>
-            <div className='flex justify-center items-center gap-2'>
-              <div className="progress-bar w-32 bg-[#9A9A9A] h-1 rounded-full"></div>
-              <p>5.0</p>
-            </div>
-          </div>
-        </div>
-        <div className='w-11/12 grid grid-cols-2 gap-x-10 gap-y-12 my-10'>
-          <ReviewCard />
-          <ReviewCard />
-          <ReviewCard />
-          <ReviewCard />
-        </div>
-        <div className="show-all my-7">
-          <button className='border rounded-md text-[#484848] flex justify-center items-center h-16 w-56'>Show All 100 Reviews</button>
-        </div>
-      </div>
+      </main>
 
       <FooterDiv />
-    </>
-  )
-}
+    </div>
+  );
+};
 
-
-export default page
+export default PropertyPage;

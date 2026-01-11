@@ -58,8 +58,8 @@ const FooterDiv = () => {
 
         {/* Bottom Section */}
         <div className='border-t mt-48 pt-5 flex flex-col md:flex-row justify-between text-[#484848] text-sm'>
-          <p>© 2025 Jenish Sakariya | All rights reserved</p>
-          <p>Created by <span className='font-semibold'>Jenish Sakariya{/*Add portfolio Link here*/}</span></p>
+          <p>© 2026 Venue Finding & reservasion | All rights reserved</p>
+          <p>Created by <span className='font-semibold'></span></p>
         </div>
       </div>
     </>

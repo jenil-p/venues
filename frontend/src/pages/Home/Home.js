@@ -1,44 +1,51 @@
 "use client";
-import React from 'react'
-import { useEffect } from 'react';
-
-import Navbar from '@/components/Navbar';
-import FooterDiv from '@/components/Footer';
-
-import Hero from './Hero';
-import Suggestions from './Suggestion';
-import HostingBanner from './HostingBanner';
-import FeaturedProperties from './FeaturedProperties';
-import MoreProperties from './MoreProperties';
-import GuidesAndTips from './Guide';
-
+import React, { useEffect, useState } from 'react';
+import Navbar from '@/components/Navbar'; // Assuming you have this
+import FooterDiv from '@/components/Footer'; // Assuming you have this
+import Suggestions from './Suggestion'; // Adjust path as needed
+import { venueService } from '@/api/venue.service';
 import Lenis from "lenis";
 
 const Home = () => {
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Smooth Scroll Setup
   useEffect(() => {
     const lenis = new Lenis();
-
     function raf(time) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
-
     requestAnimationFrame(raf);
+    return () => lenis.destroy();
   }, []);
+
+  // Data Fetching
+  useEffect(() => {
+    async function fetchVenues() {
+      try {
+        setLoading(true);
+        const response = await venueService.getVenues();
+        setVenues(response.data);
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVenues();
+  }, []);
+
   return (
-    <>
+    <main className="min-h-screen flex flex-col">
       <Navbar />
 
-      <Hero />
-      <Suggestions />
-      <HostingBanner />
-      <FeaturedProperties/>
-      <MoreProperties/>
-      <GuidesAndTips/>
+      <Suggestions venues={venues} isLoading={loading} />
 
-      <FooterDiv/>
-    </>
-  )
-}
+      <FooterDiv />
+    </main>
+  );
+};
 
-export default Home
+export default Home;

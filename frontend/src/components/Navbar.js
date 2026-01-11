@@ -5,13 +5,10 @@ import { IoIosMenu } from "react-icons/io";
 import Link from "next/link";
 
 import { useAuth } from "@/context/AuthContext";
-import { authService } from "@/api/auth.service";
 import AuthModal from "./auth/AuthModal";
 
 const Navbar = () => {
   let { authStatus, user, logout } = useAuth();
-
-  console.log(authStatus , user)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAuth, setOpenAuth] = useState(false);

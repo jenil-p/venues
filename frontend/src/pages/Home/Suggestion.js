@@ -1,66 +1,49 @@
-import React from 'react'
+import React from 'react';
+import VenueCard from '@/components/cards/VenueCard';
 
-import SimpleDisplayCard from '@/components/cards/SimpleDisplay';
-import RatingCard from '@/components/cards/RatingCard';
-
-
-const Suggestions = () => {
-  return (
-    <>
-    <div className='w-full px-20 pt-32 flex flex-col justify-center items-center'>
-      {/* Latest */}
-      <div className='w-full'>
-        <div className='h-full w-full'>
-          <div className="text-[#484848] text-4xl font-bold flex flex-col gap-1.5">
-            <p className='font-inter '>Latest on The</p>
-            <p className='font-inter '>Property Listing</p>
-            <div className='bg-[#484848] h-1.5 w-40 rounded-full mt-5'></div>
-          </div>
-          <div className="cards flex justify-between items-center flex-wrap my-20">
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-          </div>
-        </div>
-      </div>
-
-      {/* Nearby */}
-      <div className='w-full mt-16'>
-        <div className='h-full w-full'>
-          <div className="text-[#484848] text-4xl font-bold flex flex-col gap-1.5">
-            <p className='font-inter '>Nearby</p>
-            <p className='font-inter '>Listed Properties</p>
-            <div className='bg-[#484848] h-1.5 w-40 rounded-full mt-5'></div>
-          </div>
-          <div className="cards flex justify-between items-center flex-wrap my-20">
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-              <SimpleDisplayCard/>
-          </div>
-        </div>
-      </div>
-
-      {/* Top rated */}
-      <div className='w-full mt-16'>
-        <div className='h-full w-full'>
-          <div className="text-[#484848] text-4xl font-bold flex flex-col gap-1.5">
-            <p className='font-inter '>Top Rated</p>
-            <p className='font-inter '>Properties</p>
-            <div className='bg-[#484848] h-1.5 w-40 rounded-full mt-5'></div>
-          </div>
-          <div className="cards flex justify-between items-center flex-wrap my-20">
-              <RatingCard/>
-              <RatingCard/>
-              <RatingCard/>
-              <RatingCard/>
-          </div>
-        </div>
-      </div>
+const SectionContainer = ({ title, subtitle, children }) => (
+  <section className="w-full py-6">
+    <div className="flex flex-col gap-1 mb-6 px-1">
+      <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+      {subtitle && <p className="text-gray-500 text-sm">{subtitle}</p>}
     </div>
-    </>
-  )
-}
+    {children}
+  </section>
+);
 
-export default Suggestions
+const Suggestions = ({ venues, isLoading }) => {
+
+  const skeletons = Array(10).fill(0);
+
+  if (isLoading) {
+    return (
+      <div className="w-[90%] m-auto pt-24 pb-10 px-6 2xl:px-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-6 gap-y-10">
+          {skeletons.map((_, i) => (
+            <div key={i} className="flex flex-col gap-3 animate-pulse">
+              <div className="aspect-square w-full bg-gray-200 rounded-xl" />
+              <div className="h-4 w-2/3 bg-gray-200 rounded" />
+              <div className="h-4 w-1/3 bg-gray-200 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-[90%] m-auto pt-24 pb-10 px-6 2xl:px-10">
+
+      <SectionContainer title="Explore Venues" subtitle="Latest additions to our exclusive list">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-6 gap-y-10">
+          {venues.map((venue, i) => (
+            <VenueCard key={`venue-${i}`} venue={venue} />
+          ))}
+        </div>
+      </SectionContainer>
+
+    </div>
+  );
+};
+
+export default Suggestions;

@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
       .getMe()
       .then((res) => {
         setUser(res.user);
-        console.log("res..." , res.user);
         if(!res.user){
           setAuthStatus("guest")
         }else{
