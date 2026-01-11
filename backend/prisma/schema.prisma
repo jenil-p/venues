@@ -199,6 +199,7 @@ model VenuePhoto {
 
   venueId Int
   venue   Venue @relation(fields: [venueId], references: [id])
+  @@unique([venueId, order])
 }
 
 // ----------------------- REVIEWS -----------------------
