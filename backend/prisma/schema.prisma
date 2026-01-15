@@ -27,7 +27,8 @@ model State {
 
   country Country @relation(fields: [countryId], references: [id])
   cities  City[]
-  @@unique([name , countryId])
+
+  @@unique([name, countryId])
 }
 
 // ------------------ CITY ------------------
@@ -39,7 +40,8 @@ model City {
   state   State     @relation(fields: [stateId], references: [id])
   address Address[]
   service Service[]
-  @@unique([name , stateId])
+
+  @@unique([name, stateId])
 }
 
 // ------------------ ADDRESS ------------------
@@ -130,7 +132,7 @@ model Venue {
   contactnumber1 String
   contactnumber2 String?
 
-  rating Float @default(0)
+  rating Decimal @default(0.0) @db.Decimal(3, 2)
 
   status VenueStatus @default(DRAFT)
 
@@ -201,6 +203,7 @@ model VenuePhoto {
 
   venueId Int
   venue   Venue @relation(fields: [venueId], references: [id])
+
   @@unique([venueId, order])
 }
 
@@ -227,7 +230,7 @@ model VenueStatistic {
   pageViews         Int?
   bookingrequests   Int?
   confirmedbookings Int?
-  revenue           Float?
+  revenue           Decimal? @db.Decimal(10, 2)
 
   venueId Int
   venue   Venue @relation(fields: [venueId], references: [id])
@@ -238,7 +241,7 @@ model VenuePricingRule {
   id        Int       @id @default(autoincrement())
   venueId   Int
   unit      PriceUnit
-  price     Float
+  price     Decimal   @db.Decimal(10, 2)
   startTime DateTime?
   endTime   DateTime?
 
@@ -261,10 +264,10 @@ model ServiceCategory {
 
 // ================= SERVICE =================
 model Service {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String
-  basePrice   Float
+  basePrice   Decimal @db.Decimal(10, 2)
 
   categoryId Int
   providerId Int
@@ -304,7 +307,7 @@ model ServiceStatistic {
   views     Int?
   inquiries Int?
   bookings  Int?
-  revenue   Float?
+  revenue   Decimal? @db.Decimal(10, 2)
 
   serviceId Int
   service   Service @relation(fields: [serviceId], references: [id])
@@ -328,7 +331,7 @@ model Booking {
   startTime              DateTime
   endTime                DateTime
   numberOfGuestsExpected Int?
-  totalCost              Float
+  totalCost              Decimal  @db.Decimal(10, 2)
 
   venue Venue @relation(fields: [venueId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -347,7 +350,7 @@ model BookingService {
   bookingId Int
   serviceId Int
 
-  priceAtBooking Float
+  priceAtBooking Decimal @db.Decimal(10, 2)
 
   booking Booking @relation(fields: [bookingId], references: [id])
   service Service @relation(fields: [serviceId], references: [id])
@@ -357,10 +360,10 @@ model BookingService {
 
 // ----------------------- PAYMENT -----------------------
 model Payment {
-  id            Int    @id @default(autoincrement())
-  bookingId     Int    @unique
-  transactionId String @unique
-  amount        Float
+  id            Int     @id @default(autoincrement())
+  bookingId     Int     @unique
+  transactionId String  @unique
+  amount        Decimal @db.Decimal(10, 2)
 
   paymentMethod PaymentMethod @default(CREDIT_CARD)
   status        PaymentStatus @default(PENDING)
