@@ -8,12 +8,14 @@ import { useAuth } from "@/context/AuthContext";
 import AuthModal from "./auth/AuthModal";
 
 import { authService } from "@/api/auth.service";
+import { providerService } from "@/api/provider.service";
 
 const Navbar = () => {
   const { authStatus, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAuth, setOpenAuth] = useState(false);
   const [role, setRole] = useState("USER");
+  const [loadingHost, setLoadingHost] = useState(false);
   const menuRef = useRef(null);
   const router = useRouter();
 
@@ -41,11 +43,28 @@ const Navbar = () => {
     setRolefun();
   }, []);
 
-  const handleBecomeHost = () => {
-    if (authStatus === "logged_in") {
-      router.push("/host/join");
-    } else {
+  const handleBecomeHost = async () => {
+    if (authStatus !== "logged_in") {
       setOpenAuth(true);
+      return;
+    }
+    setLoadingHost(true);
+    try {
+      const data = await providerService.getProviderRequestStatus();
+
+      if (data.exists) {
+        router.push("/host/status");
+        console.log("status" , data)
+      } else {
+        router.push("/host/join");
+        console.log("form " , data)
+      }
+    } catch (error) {
+      console.error("Error checking host status", error);
+      router.push("/host/join");
+    }
+     finally {
+      setLoadingHost(false);
     }
   };
 
@@ -74,7 +93,6 @@ const Navbar = () => {
             {/* Right Section */}
             <div className="flex items-center gap-4 relative" ref={menuRef}>
 
-              {/* Become a Host Button (Distinct Style) */}
               {role === "USER" &&
                 <div
                   onClick={handleBecomeHost}

@@ -11,7 +11,7 @@ export async function requestProvider(req, res) {
     }
 
     const madeAddress = await prisma.address.create({
-      data:{
+      data: {
         latitude: 0.00,
         longitude: 0.00,
         location: address.location,
@@ -83,16 +83,46 @@ export async function myProviderProfile(req, res) {
 
     const profile = await prisma.providerProfile.findUnique({
       where: { userId },
-      include: {
-        address: true
+      select: {
+        id: true,
+        userId: true,
+        legalname: true,
+        contact1: true,
+        contact2: true,
+        dateOfBirth: true,
+        idProof: true,
+        photo: true,
+        status: true,
+        address: {
+          select: {
+            location: true,
+            postalcode: true,
+            city: {
+              select: {
+                name: true,
+                state: {
+                  select: {
+                    name: true,
+                    country: {
+                      select: {
+                        name: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     });
 
-    if (!profile) {
-      return res.status(404).json({ message: "No provider request found" });
-    }
 
-    return res.status(200).json(profile);
+    if (!profile) {
+      // return res.status(404).json({ message: "No provider request found" });
+      return res.status(200).json({ exists: false }); // easier to handle in frontend.
+    }
+    return res.status(200).json({ exists: true, profile });
 
   } catch (err) {
     return res.status(500).json({ message: "Error occurred", error: err.message });

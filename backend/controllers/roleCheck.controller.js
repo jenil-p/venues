@@ -21,8 +21,6 @@ export async function isAdmin(req, res) {
             }
         })
 
-        console.log(req.user , findAdmin);
-
         if (!findAdmin) return res.status(200).json({ isAdmin: false });
         else return res.status(200).json({ isAdmin: true });
     } catch (error) {

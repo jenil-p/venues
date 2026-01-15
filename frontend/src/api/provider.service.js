@@ -4,7 +4,7 @@ export const providerService = {
     makeRequestToBeProvider(data) {
         return apiClient.post("/providers", data);
     },
-    getReqStatus() {
+    getProviderRequestStatus() {
         return apiClient.get("/providers/me");
     },
     getCities() {

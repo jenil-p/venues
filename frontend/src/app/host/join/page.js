@@ -112,7 +112,7 @@ const HostJoinPage = () => {
 
         const returned = await providerService.makeRequestToBeProvider(payload);
         console.log(returned);
-        router.push('/host/success'); 
+        router.push('/host/status'); 
     } catch (error) {
         console.error("Failed to register:", error);
         alert("Something went wrong. Please try again.");

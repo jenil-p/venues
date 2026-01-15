@@ -5,9 +5,6 @@ import React from 'react'
 import Navbar from '@/components/Navbar';
 import FooterDiv from '@/components/Footer';
 import DarkButton from '@/components/DarkButton';
-import BlogCard from '@/components/cards/BlogCard';
-
-import { IoSearch } from "react-icons/io5";
 
 const page = () => {
 

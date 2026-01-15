@@ -73,4 +73,7 @@ app.use('/api/v1/venues', uservenueRoutes);
 app.use('/api/v1/address' , addressRoutes);
 app.use('/api/v1/role' , checkRoleRoutes);
 
+import dlogin from './routes/dlogin.route.js';
+app.use('/' , dlogin);
+
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
