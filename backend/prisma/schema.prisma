@@ -273,6 +273,8 @@ model Service {
   providerId Int
   cityId     Int
 
+  rating Decimal @default(0.0) @db.Decimal(3, 2)
+
   status ServiceStatus @default(PENDING)
 
   category ServiceCategory @relation(fields: [categoryId], references: [id])
