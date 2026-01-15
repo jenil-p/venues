@@ -2,7 +2,7 @@ import prisma from "../../prisma/client.js";
 
 export async function assignRoleToUser(req, res, next) {
     try {
-        const { userId, roleId } = req.body;
+        const { userId, roleId } = req.params;
 
         const user = await prisma.user.findUnique({
             where: {
@@ -69,7 +69,7 @@ export async function assignRoleToUser(req, res, next) {
 
 export async function deAssignRoleFromUser(req, res, next) {
     try {
-        const { userId, roleId } = req.body;
+        const { userId, roleId } = req.params;
 
         const user = await prisma.user.findUnique({
             where: { 

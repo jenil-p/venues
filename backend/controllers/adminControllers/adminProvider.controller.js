@@ -2,18 +2,19 @@ import prisma from "../../prisma/client.js";
 
 export async function approveProvider(req, res, next) {
   try {
-    const { id } = req.params;
+    console.log("req came to approvec...")
+    const { providerId } = req.params;
 
     const provider = await prisma.providerProfile.findUnique({
-      where: { id: Number(id) }
+      where: { id: Number(providerId) }
     });
 
     if (!provider) {
       return res.status(404).json({ message: "Invalid provider request" });
     }
 
-    if(provider.status == "APPROVED"){
-      return res.status(409).json({ message: "provider is already approved."})
+    if (provider.status == "APPROVED") {
+      return res.status(409).json({ message: "provider is already approved." })
     }
 
     await prisma.providerProfile.update({
@@ -45,7 +46,7 @@ export async function approveProvider(req, res, next) {
       })
     }
 
-    req.objectId = id;
+    req.objectId = providerId;
 
     res.status(200).json({ message: "provider approved successfully" });
     next();
@@ -57,18 +58,18 @@ export async function approveProvider(req, res, next) {
 
 export async function rejectProvider(req, res, next) {
   try {
-    const { id } = req.params;
-
+    console.log("req came to reject...")
+    const { providerId } = req.params;
     const provider = await prisma.providerProfile.findUnique({
-      where: { id: Number(id) }
+      where: { id: Number(providerId) }
     });
 
     if (!provider) {
       return res.status(404).json({ message: "Invalid provider request" });
     }
-
-    if(provider.status !== "PENDING"){
-      return res.status(409).json({ message: "status conflict."})
+    console.log(provider.status)
+    if (provider.status !== "PENDING" && provider.status !== "APPROVED") {
+      return res.status(409).json({ message: "status conflict." })
     }
 
     await prisma.providerProfile.update({
@@ -76,7 +77,7 @@ export async function rejectProvider(req, res, next) {
       data: { status: "REJECTED" }
     });
 
-    req.objectId = id;
+    req.objectId = providerId;
 
     res.status(200).json({ message: "provider rejected successfully" });
     next();
@@ -88,6 +89,7 @@ export async function rejectProvider(req, res, next) {
 
 export async function getAllProvider(req, res, next) {
   try {
+    console.log("req came to getall...")
     const providers = await prisma.providerProfile.findMany({});
 
     res.status(200).json({ message: "got all providers", providers });
@@ -99,13 +101,44 @@ export async function getAllProvider(req, res, next) {
 
 export async function getProvider(req, res, next) {
   try {
+    console.log("req came to get one...")
     const { providerId } = req.params;
 
     const provider = await prisma.providerProfile.findUnique({
-      where: {
-        id: Number(providerId)
+      where: { id: Number(providerId) },
+      select: {
+        id: true,
+        userId: true,
+        legalname: true,
+        contact1: true,
+        contact2: true,
+        dateOfBirth: true,
+        idProof: true,
+        photo: true,
+        status: true,
+        address: {
+          select: {
+            location: true,
+            postalcode: true,
+            city: {
+              select: {
+                name: true,
+                state: {
+                  select: {
+                    name: true,
+                    country: {
+                      select: {
+                        name: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-    })
+    });
 
     if (!provider) {
       return res.status(404).json({ message: "provider not found." });
@@ -123,6 +156,7 @@ export async function getProvider(req, res, next) {
 
 export async function deleteProvider(req, res, next) {
   try {
+    console.log("req came to delete one...")
     const { providerId } = req.params;
 
     const providerExists = await prisma.providerProfile.findUnique({

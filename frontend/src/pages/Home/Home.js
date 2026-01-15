@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar'; // Assuming you have this
-import FooterDiv from '@/components/Footer'; // Assuming you have this
-import Suggestions from './Suggestion'; // Adjust path as needed
+import Navbar from '@/components/Navbar';
+import FooterDiv from '@/components/Footer';
+import Suggestions from './Suggestion';
 import { venueService } from '@/api/venue.service';
 import Lenis from "lenis";
 

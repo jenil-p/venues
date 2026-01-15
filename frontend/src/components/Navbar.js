@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { IoIosMenu } from "react-icons/io";
 import { FaUserCircle } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -54,16 +55,16 @@ const Navbar = () => {
 
       if (data.exists) {
         router.push("/host/status");
-        console.log("status" , data)
+        console.log("status", data)
       } else {
         router.push("/host/join");
-        console.log("form " , data)
+        console.log("form ", data)
       }
     } catch (error) {
       console.error("Error checking host status", error);
       router.push("/host/join");
     }
-     finally {
+    finally {
       setLoadingHost(false);
     }
   };
@@ -125,6 +126,17 @@ const Navbar = () => {
 
                     {authStatus === "logged_in" ? (
                       <>
+                        {role === "ADMIN" && (
+                          <>
+                            <div
+                              className="px-4 py-3 hover:bg-neutral-100 font-bold text-rose-500 flex items-center gap-2 transition"
+                              onClick={() => router.push('/admin')}
+                            >
+                              <MdDashboard /> Admin Panel
+                            </div>
+                            <hr />
+                          </>
+                        )}
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>
