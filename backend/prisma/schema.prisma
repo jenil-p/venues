@@ -27,6 +27,7 @@ model State {
 
   country Country @relation(fields: [countryId], references: [id])
   cities  City[]
+  @@unique([name , countryId])
 }
 
 // ------------------ CITY ------------------
@@ -38,6 +39,7 @@ model City {
   state   State     @relation(fields: [stateId], references: [id])
   address Address[]
   service Service[]
+  @@unique([name , stateId])
 }
 
 // ------------------ ADDRESS ------------------
