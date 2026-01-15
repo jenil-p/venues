@@ -10,7 +10,7 @@ export async function approveService(req, res, next) {
             }
         })
 
-        if(!service){
+        if (!service) {
             return res.status(404).json({ message: "service not found" })
         }
 
@@ -48,7 +48,7 @@ export async function rejectService(req, res, next) {
             }
         })
 
-        if(!service){
+        if (!service) {
             return res.status(404).json({ message: "service not found" })
         }
 
@@ -78,8 +78,30 @@ export async function rejectService(req, res, next) {
 
 export async function getAllServices(req, res, next) {
     try {
-        const services = await prisma.service.findMany({})
-        
+        const services = await prisma.service.findMany({
+            select: {
+                id: true,
+                name: true,
+                rating: true,
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                city: {
+                    select: {
+                        name: true
+                    }
+                },
+                provider: {
+                    select: {
+                        legalname: true
+                    }
+                },
+                status: true
+            }
+        })
+
         res.status(200).json({ services });
         next();
     }
@@ -98,13 +120,41 @@ export async function getService(req, res, next) {
                 id: Number(serviceId),
             },
             include: {
-                category: true,               
-                city: true,
-                provider: true,
-            }
-        })
+                category: true,
 
-        if(!service){
+                city: {
+                    include: {
+                        state: {
+                            include: {
+                                country: true
+                            }
+                        }
+                    }
+                },
+
+                provider: {
+                    include: {
+                        user: true,
+                        address: {
+                            include: {
+                                city: {
+                                    include: {
+                                        state: {
+                                            include: {
+                                                country: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+        if (!service) {
             return res.status(404).json({ message: "service not found." });
         }
 
@@ -128,11 +178,11 @@ export async function deleteService(req, res, next) {
             }
         })
 
-        if(!service){
+        if (!service) {
             return res.status(404).json({ message: "service not found." });
         }
 
-        if(service.status === "DELETED"){
+        if (service.status === "DELETED") {
             return res.status(400).json({ message: "service has already been deleted." });
         }
 
@@ -141,13 +191,13 @@ export async function deleteService(req, res, next) {
                 id: Number(serviceId),
             },
             data: {
-                status:  "DELETED",
+                status: "DELETED",
             }
         })
 
         req.objectId = service.id;
 
-        res.status(200).json({message: "service deleted successfully.", service });
+        res.status(200).json({ message: "service deleted successfully.", service });
         next();
     } catch (err) {
         return res.status(500).json({ message: "failed deleting service" });

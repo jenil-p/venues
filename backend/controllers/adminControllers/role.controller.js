@@ -56,3 +56,11 @@ export async function deleteRole(req, res, next) {
         return res.status(500).json({ error: err.message });
     }
 }
+
+export async function getAllRoles(req , res , next) {
+    const roles = await prisma.role.findMany({})
+
+    res.status(200).json({roles});
+
+    next();
+}

@@ -18,7 +18,6 @@ const ProvidersPage = () => {
         setLoading(true);
         try {
             const res = await adminService.getAllPrviders();
-            console.log(res)
             setProviders(res.providers || []);
         } catch (error) {
             console.error(error);
@@ -46,7 +45,6 @@ const ProvidersPage = () => {
 
     const handleReject = async (id) => {
         if (!confirm("Are you sure you want to reject this provider?")) return;
-        console.log("reject him ", id)
         try {
             await adminService.rejectProvider(id);
             toast.success("Provider Rejected");
@@ -67,11 +65,11 @@ const ProvidersPage = () => {
         }
     };
 
-    const handleOnclick = async (providerId) =>{
+    const handleOnclickProvider = (providerId) => {
         if (providerId) {
-        router.push(`/admin/providers/${providerId}`);
+            router.push(`/admin/providers/${providerId}`);
         } else {
-        console.error("Venue ID is missing");
+            console.error("Venue ID is missing");
         }
     }
 
@@ -147,12 +145,12 @@ const ProvidersPage = () => {
                                     </tr>
                                 ) : (
                                     filteredProviders.map((provider) => (
-                                        <tr key={provider.id} onClick={() => handleOnclick(provider.id)} className="bg-white border-b hover:bg-gray-50 transition">
+                                        <tr key={provider.id} className="bg-white border-b hover:bg-gray-50 transition">
                                             {/* Applicant Info */}
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <img className="w-10 h-10 rounded-full object-cover bg-gray-200" src={provider.photo} alt="" />
-                                                    <div>
+                                                    <div onClick={() => handleOnclickProvider(provider.id)} className="hover:underline cursor-pointer">
                                                         <div className="font-semibold text-gray-900">{provider.legalname}</div>
                                                         <div className="text-xs text-gray-500">ID: {provider.id}</div>
                                                     </div>

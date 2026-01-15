@@ -69,7 +69,7 @@ const VenueCard = ({ venue }) => {
           </h3>
           <div className="flex items-center gap-1 text-[14px] shrink-0">
             <FaStar className="h-3 w-3 text-black" />
-            <span>{rating > 0 ? rating.toFixed(2) : "New"}</span>
+            <span>{rating > 0 ? rating : "New"}</span>
           </div>
         </div>
         

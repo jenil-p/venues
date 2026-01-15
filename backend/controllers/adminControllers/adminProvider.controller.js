@@ -58,7 +58,6 @@ export async function approveProvider(req, res, next) {
 
 export async function rejectProvider(req, res, next) {
   try {
-    console.log("req came to reject...")
     const { providerId } = req.params;
     const provider = await prisma.providerProfile.findUnique({
       where: { id: Number(providerId) }
@@ -67,7 +66,6 @@ export async function rejectProvider(req, res, next) {
     if (!provider) {
       return res.status(404).json({ message: "Invalid provider request" });
     }
-    console.log(provider.status)
     if (provider.status !== "PENDING" && provider.status !== "APPROVED") {
       return res.status(409).json({ message: "status conflict." })
     }
@@ -89,7 +87,6 @@ export async function rejectProvider(req, res, next) {
 
 export async function getAllProvider(req, res, next) {
   try {
-    console.log("req came to getall...")
     const providers = await prisma.providerProfile.findMany({});
 
     res.status(200).json({ message: "got all providers", providers });
@@ -101,7 +98,6 @@ export async function getAllProvider(req, res, next) {
 
 export async function getProvider(req, res, next) {
   try {
-    console.log("req came to get one...")
     const { providerId } = req.params;
 
     const provider = await prisma.providerProfile.findUnique({
@@ -156,7 +152,6 @@ export async function getProvider(req, res, next) {
 
 export async function deleteProvider(req, res, next) {
   try {
-    console.log("req came to delete one...")
     const { providerId } = req.params;
 
     const providerExists = await prisma.providerProfile.findUnique({

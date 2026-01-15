@@ -10,7 +10,7 @@ export async function approveVenue(req, res, next) {
             }
         })
 
-        if(!venue){
+        if (!venue) {
             return res.status(404).json({ message: "venue not found" })
         }
 
@@ -48,7 +48,7 @@ export async function rejectVenue(req, res, next) {
             }
         })
 
-        if(!venue){
+        if (!venue) {
             return res.status(404).json({ message: "venue not found" })
         }
 
@@ -78,8 +78,32 @@ export async function rejectVenue(req, res, next) {
 
 export async function getAllVenues(req, res, next) {
     try {
-        const venues = await prisma.venue.findMany({})
-        
+        const venues = await prisma.venue.findMany({
+            include: {
+                address: {
+                    select: {
+                        location: true,
+                        postalcode: true,
+                        city: {
+                            select: {
+                                name: true,
+                                state: {
+                                    select: {
+                                        name: true,
+                                        country: {
+                                            select: {
+                                                name: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
         res.status(200).json({ venues });
         next();
     }
@@ -97,17 +121,116 @@ export async function getVenue(req, res, next) {
             where: {
                 id: Number(venueId),
             },
-            include: {
-                address : true,
-                features : true,
-                provider : true,
-                photos : true,
-                pricing : true,
-                types : true,                
-            }
-        })
+            select: {
+                id: true,
+                venuename: true,
+                description: true,
+                capacity: true,
+                contactemail: true,
+                contactnumber1: true,
+                contactnumber2: true,
+                rating: true,
+                status: true,
 
-        if(!venue){
+                address: {
+                    select: {
+                        location: true,
+                        postalcode: true,
+                        latitude: true,
+                        longitude: true,
+                        city: {
+                            select: {
+                                name: true,
+                                state: {
+                                    select: {
+                                        name: true,
+                                        country: {
+                                            select: {
+                                                name: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                provider: {
+                    select: {
+                        id: true,
+                        legalname: true,
+                        contact1: true,
+                        contact2: true,
+                        status: true,
+                        user: {
+                            select: {
+                                fullname: true,
+                                email: true,
+                                contactnumber: true
+                            }
+                        }
+                    }
+                },
+
+                features: {
+                    select: {
+                        feature: {
+                            select: {
+                                name: true,
+                                icon: true
+                            }
+                        }
+                    }
+                },
+
+                types: {
+                    select: {
+                        type: {
+                            select: {
+                                name: true,
+                                icon: true
+                            }
+                        }
+                    }
+                },
+
+                photos: {
+                    select: {
+                        image: true,
+                        description: true,
+                        order: true
+                    },
+                    orderBy: {
+                        order: 'asc'
+                    }
+                },
+
+                pricing: {
+                    select: {
+                        unit: true,
+                        price: true,
+                        startTime: true,
+                        endTime: true
+                    }
+                },
+
+                reviews: {
+                    select: {
+                        rating: true,
+                        comment: true,
+                        createdAt: true,
+                        user: {
+                            select: {
+                                fullname: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!venue) {
             return res.status(400).json({ message: "venue not found." });
         }
 
@@ -131,11 +254,11 @@ export async function deleteVenue(req, res, next) {
             }
         })
 
-        if(!venue){
+        if (!venue) {
             return res.status(400).json({ message: "venue not found." });
         }
 
-        if(venue.status === "DELETED"){
+        if (venue.status === "DELETED") {
             return res.status(400).json({ message: "venue has already been deleted." });
         }
 
@@ -144,13 +267,13 @@ export async function deleteVenue(req, res, next) {
                 id: Number(venueId),
             },
             data: {
-                status:  "DELETED",
+                status: "DELETED",
             }
         })
 
         req.objectId = venue.id;
 
-        res.status(200).json({message: "venue deleted successfully.", venue });
+        res.status(200).json({ message: "venue deleted successfully.", venue });
         next();
     } catch (err) {
         return res.status(500).json({ message: "failed deleting venue" });

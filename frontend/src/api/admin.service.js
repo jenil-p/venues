@@ -5,6 +5,10 @@ export const adminService = {
         return apiClient.post('/admin/roles' , { rolename: roleName });
     },
 
+    getAllRoles(){
+        return apiClient.get('/admin/roles');
+    },
+
     deleteRole(roleId){
         return apiClient.delete(`/admin/roles/${roleId}`);
     },
@@ -70,7 +74,7 @@ export const adminService = {
         return apiClient.delete(`admin/services/${serviceId}/approval`);
     },
 
-    getAllVService(){
+    getAllService(){
         return apiClient.get('/admin/services');
     },
 
