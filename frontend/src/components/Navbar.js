@@ -137,6 +137,17 @@ const Navbar = () => {
                             <hr />
                           </>
                         )}
+                        {role === "PROVIDER" && (
+                          <>
+                            <div
+                              className="px-4 py-3 hover:bg-neutral-100 font-bold text-rose-500 flex items-center gap-2 transition"
+                              onClick={() => router.push('/host/dashboard')}
+                            >
+                              <MdDashboard /> Provider Dashboard
+                            </div>
+                            <hr />
+                          </>
+                        )}
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>

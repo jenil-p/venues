@@ -100,13 +100,133 @@ export async function setPricing(req, res) {
   return res.json({ message: "Pricing updated" });
 }
 
-export async function submitVenue(req, res) {
-  const { venueId } = req.params;
+export async function getVenue(req, res) {
+  try {
+    const { venueId } = req.params;
 
-  await prisma.venue.update({
-    where: { id: Number(venueId) },
-    data: { status: "PENDING" }
-  });
+    const venue = await prisma.venue.findUnique({
+      where: {
+        id: Number(venueId)
+      },
+      include: {
+        address: {
+          include: {
+            city: true
+          }
+        },
+        features: {
+          include: {
+            feature: true
+          }
+        },
+        types: {
+          include: {
+            type: true
+          }
+        },
+        photos: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
+        pricing: true,
+        provider: true,
+      }
+    });
 
-  return res.json({ message: "Venue submitted for review" });
+    if (!venue) {
+      return res.status(404).json({ message: "Venue not found" });
+    }
+
+    return res.status(200).json({ venue });
+
+  } catch (err) {
+    console.error("Get Venue Error:", err);
+    return res.status(500).json({ message: "Error fetching venue details", error: err.message });
+  }
+}
+
+export async function getAllVenues(req, res) {
+  try {
+    const user = req.user;
+    const provider = await prisma.providerProfile.findUnique({
+      where: {
+        userId: user.id
+      }
+    })
+    const venues = await prisma.venue.findMany({
+      where: {
+        providerId: provider.id,
+      },
+      select: {
+        id: true,
+        status: true,
+        capacity: true,
+        address: {
+          select: {
+            location: true,
+            city: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+        photos: {
+          where: {
+            order: 1
+          },
+          select: {
+            image: true,
+          }
+        }
+      }
+    })
+
+    return res.status(200).json({ venues })
+  } catch (err) {
+    console.error("Get Venues Error:", err);
+    return res.status(500).json({ message: "Error fetching venues", error: err.message });
+  }
+}
+
+export async function deleteVenue(req, res) {
+  try {
+    const { venueId } = req.params;
+
+    const deletedVenue = await prisma.venue.update({
+      where: {
+        id: Number(venueId)
+      },
+      data: {
+        status: "DELETED",
+      }
+    })
+
+    return res.status(200).json({ isdeleted: true });
+  } catch (err) {
+    return res.status(500).json({ message: "internal server error", isdeleted: false });
+  }
+}
+
+export async function deletePhoto(req, res) {
+  try {
+    const { venueId, photoId } = req.params;
+    const photos = await prisma.venuePhoto.findMany({
+      where: {
+        venueId: Number(venueId)
+      }
+    })
+    if(photos.length < 6){
+      return res.status(400).json({ message: "Venue must have atleast 5 photos" });
+    }
+    await prisma.venuePhoto.delete({
+      where: {
+        id: Number(photoId)
+      }
+    })
+    return res.status(200).json({ message: "Sucess" })
+  } catch (err) {
+    return res.status(500).json({ message: "internal server error" });
+  }
 }

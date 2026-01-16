@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.route.js';
 // general
 import addressRoutes from './routes/address.route.js'
 import checkRoleRoutes from './routes/roleCheck.route.js'
+import getResourceRoutes from './routes/resource.route.js'
 
 // admin
 import adminRoleRoutes from './routes/adminRoutes/role.route.js';
@@ -58,6 +59,7 @@ app.use('/api/v1/auth' , authRoutes);
 // general
 app.use('/api/v1/address' , addressRoutes);
 app.use('/api/v1/role' , checkRoleRoutes);
+app.use('/api/v1/resources' , getResourceRoutes);
 
 
 // admin functionalities
@@ -84,8 +86,5 @@ app.use('/api/v1/providers/services', listserviceRoutes); // first time listing
 // user
 app.use('/api/v1/venues', uservenueRoutes);
 
-
-import dlogin from './routes/dlogin.route.js';
-app.use('/' , dlogin);
 
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
