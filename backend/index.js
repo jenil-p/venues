@@ -34,6 +34,9 @@ import listserviceRoutes from './routes/providerRoutes/serviceRoutes/listService
 // user
 import uservenueRoutes from './routes/userRoutes/venue.routes.js'
 
+// booking
+import bookingRutes from './routes/bookingRoutes/booking.route.js'
+
 
 const app = express();
 const PORT = process.env.PORT;
@@ -86,5 +89,11 @@ app.use('/api/v1/providers/services', listserviceRoutes); // first time listing
 // user
 app.use('/api/v1/venues', uservenueRoutes);
 
+
+//booking
+app.use('/api/v1/book' , bookingRutes);
+
+import dummyLogin from './routes/dlogin.route.js'
+app.use('/' , dummyLogin);
 
 app.listen(PORT, () => console.log(`app listening at PORT:${PORT}`));
