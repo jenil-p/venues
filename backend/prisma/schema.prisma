@@ -328,7 +328,7 @@ model Booking {
   userId  Int
   venueId Int
 
-  bookingStatus BookingStatus @default(PENDING_PAYMENT)
+  bookingStatus BookingStatus @default(CART)
 
   startTime              DateTime
   endTime                DateTime
