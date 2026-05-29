@@ -15,12 +15,22 @@ export async function getVenues(req, res) {
                     select: { price: true },
                     where: { unit: "DAILY" }
                 },
+                address: {
+                    select:{
+                        location: true,
+                        city: {
+                            select:{
+                                name: true,
+                            }
+                        }
+                    }
+                }
             },
             where: {
                 status: "ACTIVE"
             }
         })
-    
+        
         return res.status(200).json({ message: "venues fatched successfully.", data: venues })
     } catch (error) {
         return res.status(500).json({ message: "internal server error" })

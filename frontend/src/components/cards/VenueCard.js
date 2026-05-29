@@ -14,6 +14,8 @@ const VenueCard = ({ venue }) => {
   const price = venue.pricing?.[0]?.price || 0;
   const rating = venue.rating || 0;
   const name = venue.venuename || "Untitled Venue";
+  const location = venue.address.location;
+  const city = venue.address.city.name;
 
   const handleCardClick = () => {
     if (id) {
@@ -74,7 +76,7 @@ const VenueCard = ({ venue }) => {
         </div>
         
         <p className="text-gray-500 text-[15px] truncate">
-           Gujarat, India
+           {location}, {city}
         </p>
 
         <div className="flex items-baseline gap-1 mt-1.5">
