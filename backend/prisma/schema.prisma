@@ -333,6 +333,7 @@ model Booking {
   startTime              DateTime
   endTime                DateTime
   numberOfGuestsExpected Int?
+  pricePerUnit Decimal   // price at the booking time
   totalCost              Decimal  @db.Decimal(10, 2)
 
   venue Venue @relation(fields: [venueId], references: [id])
@@ -343,6 +344,11 @@ model Booking {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([venueId])
+  @@index([venueId, startTime])
+  @@index([venueId, startTime, endTime])
+  @@index([userId])
 }
 
 // ----------------------- BOOKING SERVICES (Many-to-Many) -----------------------
