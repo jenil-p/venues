@@ -24,12 +24,4 @@ export const authService = {
     deleteUser(userId) {
         return apiClient.delete(`/auth/${userId}`);
     },
-
-    checkIfAdmin() {
-        return apiClient.get('/role/isadmin');
-    },
-
-    checkIfProvider() {
-        return apiClient.get('/role/isprovider');
-    },
 };

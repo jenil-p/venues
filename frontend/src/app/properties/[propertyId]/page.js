@@ -26,7 +26,6 @@ const PropertyPage = async ({ params }) => {
 
 
   const venue = await getVenueData(venueId);
-  console.log("Venue: ", venue);
 
   if (!venue) {
     return (

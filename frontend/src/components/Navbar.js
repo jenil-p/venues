@@ -33,12 +33,20 @@ const Navbar = () => {
 
   useEffect(() => {
     async function setRolefun() {
-      const isAdmin = await authService.checkIfAdmin();
-      const isProvider = await authService.checkIfProvider();
-      if (isAdmin.isAdmin == true) {
-        setRole("ADMIN")
-      } else if (isProvider.isProvider == true) {
-        setRole("PROVIDER")
+      try {
+        const { user } = await authService.getMe();
+
+        const roles = user.roles?.map(role => role.rolename) || [];
+
+        if (roles.includes("ADMIN")) {
+          setRole("ADMIN");
+        } else if (roles.includes("PROVIDER")) {
+          setRole("PROVIDER");
+        } else {
+          setRole("USER");
+        }
+      } catch (err) {
+        console.error(err);
       }
     }
     setRolefun();

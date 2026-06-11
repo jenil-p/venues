@@ -6,36 +6,36 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // auth
-import authRoutes from './routes/auth.route.js';
-
-// general
-import addressRoutes from './routes/address.route.js'
-import checkRoleRoutes from './routes/roleCheck.route.js'
-import getResourceRoutes from './routes/resource.route.js'
-
-// admin
-import adminRoleRoutes from './routes/adminRoutes/role.route.js';
-import adminAssignRoutes from './routes/adminRoutes/userrole.route.js';
-import adminProviderRoutes from './routes/adminRoutes/adminProvider.route.js';
-import adminvenueRoutes from './routes/adminRoutes/adminVenue.route.js';
-import adminserviceRoutes from './routes/adminRoutes/adminService.route.js';
+import authRoutes from './modules/auth/auth.route.js';
 
 // rbac
-import apptableRoutes from './routes/rbacRoutes/apptable.routes.js';
-import permissionRoutes from './routes/rbacRoutes/permission.routes.js';
-import operationRoutes from './routes/rbacRoutes/operation.routes.js';
+import adminRoleRoutes from './modules/rbac/role.route.js';
+import adminAssignRoutes from './modules/rbac/userrole.route.js';
+import apptableRoutes from './modules/rbac/apptable.routes.js';
+import permissionRoutes from './modules/rbac/permission.routes.js';
+import operationRoutes from './modules/rbac/operation.routes.js';
+
+// reference-data
+import addressRoutes from './modules/reference-data/address.route.js'
+import getResourceRoutes from './modules/reference-data/resource.route.js'
 
 // provider
-import providerRoutes from './routes/providerRoutes/provider.route.js';
-import listvenueRoutes from './routes/providerRoutes/venueRoutes/listVenue.route.js';
-import updatevenueRoutes from './routes/providerRoutes/venueRoutes/venue.route.js';
-import listserviceRoutes from './routes/providerRoutes/serviceRoutes/listService.route.js';
+import adminProviderRoutes from './modules/provider/adminProvider.route.js';
+import providerRoutes from './modules/provider/provider.route.js';
 
-// user
-import uservenueRoutes from './routes/userRoutes/venue.routes.js'
+// Venue
+import adminvenueRoutes from './modules/venue/admin/adminVenue.route.js';
+import listvenueRoutes from './modules/venue/provider/listVenue.route.js';
+import updatevenueRoutes from './modules/venue/provider/venue.route.js';
+import uservenueRoutes from './modules/venue/public/venue.routes.js'
+
+// Offerings - (services)
+import adminserviceRoutes from './modules/offerings/admin/adminService.route.js';
+import listserviceRoutes from './modules/offerings/provider/listService.route.js';
+
 
 // booking
-import bookingRutes from './routes/bookingRoutes/booking.route.js'
+import bookingRutes from './modules/booking/booking.route.js'
 
 
 const app = express();
@@ -59,39 +59,42 @@ app.use(
 app.use('/api/v1/auth' , authRoutes);
 
 
-// general
-app.use('/api/v1/address' , addressRoutes);
-app.use('/api/v1/role' , checkRoleRoutes);
-app.use('/api/v1/resources' , getResourceRoutes);
-
-
-// admin functionalities
-app.use('/api/v1/admin/roles' , adminRoleRoutes);
-app.use('/api/v1/admin/users' , adminAssignRoutes);
-app.use('/api/v1/admin/providers' , adminProviderRoutes);
-app.use('/api/v1/admin/venues', adminvenueRoutes);
-app.use('/api/v1/admin/services', adminserviceRoutes);
-
-
 // RBAC
 app.use('/api/v1/admin/tables' , apptableRoutes);
 app.use('/api/v1/admin/operations', operationRoutes);
 app.use('/api/v1/admin/roles' , permissionRoutes);
+app.use('/api/v1/admin/roles' , adminRoleRoutes);
+app.use('/api/v1/admin/users' , adminAssignRoutes);
+
+
+// reference-data
+app.use('/api/v1/address' , addressRoutes);
+app.use('/api/v1/resources' , getResourceRoutes);
 
 
 // provider
 app.use('/api/v1/providers' , providerRoutes);
+app.use('/api/v1/admin/providers' , adminProviderRoutes);
+
+
+// Venue
 app.use('/api/v1/providers/venues', listvenueRoutes); // first time listing 
 app.use('/api/v1/providers/venues', updatevenueRoutes); // updating its details ...
+app.use('/api/v1/admin/venues', adminvenueRoutes);
+app.use('/api/v1/venues', uservenueRoutes);
+
+
+// offerings - service
 app.use('/api/v1/providers/services', listserviceRoutes); // first time listing 
 
 
-// user
-app.use('/api/v1/venues', uservenueRoutes);
+// admin functionalities
+app.use('/api/v1/admin/services', adminserviceRoutes);
 
 
 //booking
 app.use('/api/v1/book' , bookingRutes);
+
 
 import dummyLogin from './routes/dlogin.route.js'
 app.use('/' , dummyLogin);
