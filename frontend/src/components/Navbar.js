@@ -36,6 +36,10 @@ const Navbar = () => {
       try {
         const { user } = await authService.getMe();
 
+        if(!user){ // if no user (not logged in), then there is no way we are setting any role...
+          return;
+        }
+
         const roles = user.roles?.map(role => role.rolename) || [];
 
         if (roles.includes("ADMIN")) {
