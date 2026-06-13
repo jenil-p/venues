@@ -35,6 +35,7 @@ import listserviceRoutes from './modules/offerings/provider/listService.route.js
 
 
 // booking
+import availabilityRouter from './modules/booking/availability/availability.route.js'
 import bookingRutes from './modules/booking/booking.route.js'
 
 
@@ -93,6 +94,7 @@ app.use('/api/v1/admin/services', adminserviceRoutes);
 
 
 //booking
+app.use('/api/v1/venues', availabilityRouter);
 app.use('/api/v1/book' , bookingRutes);
 
 
