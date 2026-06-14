@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import FooterDiv from '@/components/Footer';
 import VenueGallery from '@/components/venue/VenueGallery';
-import BookingWidget from '@/components/cards/BookingWidget';
+import BookingWidget from '@/components/venue/BookingWidget';
 
 import { FaRegHeart, FaStar, FaShare, FaMapMarkerAlt } from "react-icons/fa";
 import { BsDoorOpen, BsShieldCheck } from "react-icons/bs";
@@ -133,7 +133,12 @@ const PropertyPage = async ({ params }) => {
 
           <div className="md:col-span-1 relative">
             <div className="sticky top-24 w-full">
-              <BookingWidget price={price} rating={venue.rating} />
+              <BookingWidget
+                price={price}
+                rating={venue.rating}
+                venueId={venueId}
+                unit={venue.pricing?.[0]?.unit ?? "DAILY"}
+            />
             </div>
           </div>
 
