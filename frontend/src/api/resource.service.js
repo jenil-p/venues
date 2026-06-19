@@ -10,6 +10,9 @@ export const resourceService = {
     getLocations(){
         return apiClient.get("/resources/locations");
     },
+    getCities(){
+        return apiClient.get("/resources/cities");
+    },
     getFullFormOptions(){
         return apiClient.get("/resources/form-options");
     },

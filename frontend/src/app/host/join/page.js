@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { providerService } from "@/api/provider.service";
+import { resourceService } from "@/api/resource.service";
 import Navbar from "@/components/Navbar";
 import { FaChevronRight, FaCheck, FaExclamationCircle } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
@@ -30,7 +31,7 @@ const HostJoinPage = () => {
   useEffect(() => {
     async function loadCities() {
         try {
-            const cityList = await providerService.getCities();
+            const cityList = await resourceService.getCities();
             setCities(Array.isArray(cityList) ? cityList : cityList.cities || []);
         } catch (error) {
             console.error("Failed to load cities", error);

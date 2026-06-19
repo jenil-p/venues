@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -12,20 +12,32 @@ export default function AdminLayout({ children }) {
     const router = useRouter();
     const pathname = usePathname();
 
+    const [role, setRole] = useState("USER");
+
     useEffect(() => {
-        if (authStatus === "logged_out") {
-            router.push("/");
-        }
-        const checkAdmin = async () => {
-            try {
-                const data = await authService.checkIfAdmin();
-                if (!data.isAdmin) router.push("/");
-            } catch (e) {
-                router.push("/");
+        async function setRolefun() {
+          try {
+            const { user } = await authService.getMe();
+    
+            if(!user){ // if no user (not logged in), then there is no way we are setting any role...
+              return;
             }
-        };
-        if (authStatus === "logged_in") checkAdmin();
-    }, [authStatus, router]);
+    
+            const roles = user.roles?.map(role => role.rolename) || [];
+    
+            if (roles.includes("ADMIN")) {
+              setRole("ADMIN");
+            } else if (roles.includes("PROVIDER")) {
+              setRole("PROVIDER");
+            } else {
+              setRole("USER");
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        setRolefun();
+      }, []);
 
     const navItems = [
         { name: "Dashboard", href: "/admin/dashboard", icon: <MdDashboard /> },

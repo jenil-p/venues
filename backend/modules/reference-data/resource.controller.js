@@ -22,6 +22,20 @@ export async function getVenueFeatures(req, res) {
     }
 }
 
+export async function getAllCitiesOptions(req, res) {
+    try {
+        const cities = await prisma.city.findMany({
+            select: {
+                id: true,
+                name: true
+            }
+        });
+        return res.status(200).json({ cities });
+    } catch (err) {
+        return res.status(500).json({ message: "Error fetching cities", error: err.message });
+    }
+}
+
 export async function getLocationOptions(req, res) {
     try {
         const locations = await prisma.state.findMany({

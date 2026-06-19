@@ -1,8 +1,8 @@
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import FooterDiv from '@/components/Footer';
-import VenueGallery from '@/components/venue/VenueGallery';
-import BookingWidget from '@/components/venue/BookingWidget';
+import Navbar from '@/components/Navbar.js';
+import FooterDiv from '@/components/Footer.js';
+import VenueGallery from '@/components/venue/VenueGallery.js';
+import BookingWidget from '@/components/venue/BookingWidget.js';
 
 import { FaRegHeart, FaStar, FaShare, FaMapMarkerAlt } from "react-icons/fa";
 import { BsDoorOpen, BsShieldCheck } from "react-icons/bs";
