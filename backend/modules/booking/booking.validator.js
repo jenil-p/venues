@@ -29,4 +29,16 @@ export const makeBookingSchema = z.object({
             .regex(/^\d+$/, "venueId must be a numeric string")
             .transform(Number),
     }),
+
+    user: z.object({
+        id: z
+            .number({ 
+                required_error: "Authentication required. Please login first.",
+                invalid_type_error: "Authentication required. Please login first."
+            })
+            .int()
+            .positive(),
+    }).refine((user) => user != null, {
+        message: "Authentication required. Please login first.",
+    }),
 });

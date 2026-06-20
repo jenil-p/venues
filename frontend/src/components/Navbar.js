@@ -31,6 +31,16 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // if un authorized, open login model
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setOpenAuth(true);
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
+  }, []);
+
   useEffect(() => {
     async function setRolefun() {
       try {

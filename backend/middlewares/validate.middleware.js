@@ -4,6 +4,7 @@ export function validate(schema) {
             body:   req.body,
             params: req.params,
             query:  req.query,
+            user:   req.user,
         });
 
         if (!result.success) {
@@ -19,6 +20,10 @@ export function validate(schema) {
         req.params = result.data.params ?? req.params;
         // req.query  = result.data.query  ?? req.query;
         Object.assign(req.query, result.data.query);
+
+        if (result.data.user) {
+            req.user = result.data.user;
+        }
 
         next();
     };

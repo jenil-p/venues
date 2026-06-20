@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { bookingService } from "@/api/booking.service";
 import { FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+import { useAuth } from "@/context/AuthContext";
 
 const SERVICE_FEE = 2500; // just temporarily...  can remove this
 
@@ -50,7 +51,7 @@ function isDayBlocked(day, blockedSlots) {
 }
 
 // Blocked only if the WHOLE day is covered by a blocking booking.
-// Used for HOURLY venues, where one booking on part of a day shouldn't
+// Used for HOURLY venues, where one booking one part of a day shouldn't
 // prevent another customer from booking a different hour slot that day.
 function isDayFullyBlocked(day, blockedSlots) {
     const dayStart = startOfDay(day);
@@ -91,8 +92,6 @@ function combineDateAndTime(date, timeStr) {
     return d;
 }
 
-// Mirrors the backend's Math.ceil(diffHours) so the UI and the price
-// actually charged always agree.
 function computeHours(startStr, endStr) {
     const [sh, sm] = startStr.split(":").map(Number);
     const [eh, em] = endStr.split(":").map(Number);
@@ -109,102 +108,6 @@ function getFirstDayOfWeek(year, month) {
     return new Date(year, month, 1).getDay();
 }
 
-// calender
-
-// function Calendar({
-//     year, month, onMonthChange,
-//     checkIn, checkOut, hoverDay,
-//     onDayClick, onDayHover,
-//     blockedSlots,
-//     minDate,
-//     singleSelect = false,
-// }) {
-//     const daysInMonth = getDaysInMonth(year, month);
-//     const firstDayOfWeek = getFirstDayOfWeek(year, month);
-//     const today = startOfDay(new Date());
-
-//     const cells = [];
-//     for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
-//     for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
-
-//     function isBlocked(day) {
-//         return singleSelect ? isDayFullyBlocked(day, blockedSlots) : isDayBlocked(day, blockedSlots);
-//     }
-
-//     function isDisabled(day) {
-//         if (!day) return true;
-//         const d = startOfDay(day);
-//         const isPast = d < today;
-//         const isBeforeMin = minDate && d < startOfDay(minDate);
-//         return isPast || isBeforeMin || isBlocked(day);
-//     }
-
-//     function classFor(day) {
-//         if (!day) return "";
-//         const d = startOfDay(day);
-//         const disabled = isDisabled(day);
-
-//         const isStart = checkIn && isSameDay(day, checkIn);
-//         const isEnd = checkOut && isSameDay(day, checkOut);
-//         const isHover = !singleSelect && hoverDay && checkIn && !checkOut && isSameDay(day, hoverDay);
-
-//         const inRange = !singleSelect && checkIn && (checkOut || hoverDay) && (
-//             d > startOfDay(checkIn) &&
-//             d < startOfDay(checkOut || hoverDay)
-//         );
-
-//         let cls = "cal-day";
-//         if (disabled) cls += " cal-disabled";
-//         if (isStart) cls += " cal-start";
-//         if (isEnd) cls += " cal-end";
-//         if (isHover) cls += " cal-hover";
-//         if (inRange) cls += " cal-range";
-//         if (!disabled && !isStart && !isEnd) cls += " cal-hoverable";
-//         return cls;
-//     }
-
-//     return (
-//         <div className="calendar">
-//             <div className="cal-header">
-//                 <button
-//                     className="cal-nav"
-//                     onClick={() => onMonthChange(-1)}
-//                     aria-label="Previous month"
-//                 >
-//                     <FaChevronLeft size={12} />
-//                 </button>
-//                 <span className="cal-title">{MONTHS[month]} {year}</span>
-//                 <button
-//                     className="cal-nav"
-//                     onClick={() => onMonthChange(1)}
-//                     aria-label="Next month"
-//                 >
-//                     <FaChevronRight size={12} />
-//                 </button>
-//             </div>
-
-//             <div className="cal-grid cal-days-row">
-//                 {DAYS.map(d => <span key={d} className="cal-dayname">{d}</span>)}
-//             </div>
-
-//             <div className="cal-grid">
-//                 {cells.map((day, i) => (
-//                     <button
-//                         key={i}
-//                         className={classFor(day)}
-//                         disabled={isDisabled(day)}
-//                         onClick={() => day && onDayClick(day)}
-//                         onMouseEnter={() => day && onDayHover(day)}
-//                         onMouseLeave={() => onDayHover(null)}
-//                         aria-label={day ? day.toDateString() : undefined}
-//                     >
-//                         {day ? day.getDate() : ""}
-//                     </button>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// }
 
 function Calendar({
     year, month, onMonthChange,
@@ -396,6 +299,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
     const today = new Date();
     const isHourly = unit === "HOURLY";
 
+    const { authStatus } = useAuth();
     const [calOpen, setCalOpen] = useState(false);
     const [selecting, setSelecting] = useState("checkIn"); // "checkIn" | "checkOut"
     const [checkIn, setCheckIn] = useState(null);
@@ -436,6 +340,20 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
             setLoadingSlots(false);
         }
     }, [venueId]);
+
+    const handleAuthRequired = () => {
+        setBookingError("Please login to make a booking.");
+        setBookingState("error");
+        
+        // Trigger the login modal in Navbar
+        window.dispatchEvent(new Event("auth:unauthorized"));
+    };
+
+    useEffect(() => {
+        const onUnauthorized = () => handleAuthRequired();
+        window.addEventListener("auth:unauthorized", onUnauthorized);
+        return () => window.removeEventListener("auth:unauthorized", onUnauthorized);
+    }, []);
 
     useEffect(() => {
         if (calOpen) fetchAvailability(calYear, calMonth);
@@ -526,6 +444,13 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
     }
 
     async function handleReserve() {
+        if (authStatus !== "logged_in") {
+            handleAuthRequired();
+            return;
+        }
+
+        setBookingState("loading");
+        setBookingError(null);
         if (isHourly) {
             if (!checkIn) {
                 setCalOpen(true);
@@ -555,9 +480,16 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                 setConfirmedRange({ start: startDateTime, end: endDateTime });
                 setBookingState("success");
             } catch (err) {
-                const msg = err?.response?.data?.message || "Something went wrong. Please try again.";
-                setBookingError(msg);
-                setBookingState("error");
+                const msg = err?.message || err?.response?.data?.message || "Something went wrong.";
+
+                if (msg.toLowerCase().includes("login") || 
+                    msg.toLowerCase().includes("auth") || 
+                    err?.response?.status === 401) {
+                    handleAuthRequired();
+                } else {
+                    setBookingError(msg);
+                    setBookingState("error");
+                }
             }
             return;
         }
@@ -573,9 +505,6 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
             await bookingService.createBooking(venueId, {
                 noOfGuest: guests,
                 startTime: checkIn,
-                // checkOut is inclusive (the last day of the stay), so the
-                // boundary sent to the backend is midnight the day AFTER —
-                // this is what makes day 3→5 block all of 3, 4 AND 5.
                 endTime: addDays(checkOut, 1),
             });
             setConfirmedRange({ start: checkIn, end: checkOut });
@@ -828,10 +757,24 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                 )}
 
                 {/* Error message */}
-                {bookingState === "error" && bookingError && (
+                {/* {bookingState === "error" && bookingError && (
                     <div className="booking-error">
                         <span>{bookingError}</span>
                         <button onClick={() => setBookingState("idle")} aria-label="Dismiss"><MdClose size={14} /></button>
+                    </div>
+                )} */}
+                {bookingState === "error" && bookingError && (
+                    <div className="booking-error">
+                        <span>{bookingError}</span>
+                        <button 
+                            onClick={() => {
+                                setBookingState("idle");
+                                setBookingError(null);
+                            }} 
+                            aria-label="Dismiss"
+                        >
+                            <MdClose size={14} />
+                        </button>
                     </div>
                 )}
 
