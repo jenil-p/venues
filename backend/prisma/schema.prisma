@@ -342,6 +342,8 @@ model Booking {
   services BookingService[]
   payment  Payment?
 
+  expiresAt DateTime? // for PENDING_PAYMENT state
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
