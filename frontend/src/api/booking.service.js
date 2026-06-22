@@ -14,4 +14,16 @@ export const bookingService = {
             endTime:   new Date(endTime).toISOString(),
         });
     },
+
+    proceedToPayment(bookingId) {
+        return apiClient.post(`/book/proceed/${bookingId}`);
+    },
+
+    cancelBooking(bookingId) {
+        return apiClient.delete(`/book/booking/${bookingId}`);
+    },
+
+    getBooking(bookingId){
+        return apiClient.get(`/book/booking/${bookingId}`);
+    }
 };

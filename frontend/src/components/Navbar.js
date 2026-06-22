@@ -31,16 +31,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // if un authorized, open login model
-  useEffect(() => {
-    const handleUnauthorized = () => {
-      setOpenAuth(true);
-    };
-
-    window.addEventListener("auth:unauthorized", handleUnauthorized);
-    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
-  }, []);
-
   useEffect(() => {
     async function setRolefun() {
       try {
@@ -60,7 +50,7 @@ const Navbar = () => {
           setRole("USER");
         }
       } catch (err) {
-        console.error(err);
+        // console.error(err);
       }
     }
     setRolefun();
@@ -83,7 +73,7 @@ const Navbar = () => {
         console.log("form ", data)
       }
     } catch (error) {
-      console.error("Error checking host status", error);
+      // console.error("Error checking host status", error);
       router.push("/host/join");
     }
     finally {

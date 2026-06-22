@@ -5,7 +5,8 @@ import { bookingService } from "@/api/booking.service";
 import { FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { useAuth } from "@/context/AuthContext";
-
+import AuthModal from "@/components/auth/AuthModal.js"
+ 
 const SERVICE_FEE = 2500; // just temporarily...  can remove this
 
 const MONTHS = [
@@ -322,6 +323,8 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
     const [bookingError, setBookingError] = useState(null);
     const [confirmedRange, setConfirmedRange] = useState(null);
 
+    const [openAuth, setOpenAuth] = useState(false);
+
     const fetchAvailability = useCallback(async (year, month) => {
         if (!venueId) return;
         setLoadingSlots(true);
@@ -342,18 +345,10 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
     }, [venueId]);
 
     const handleAuthRequired = () => {
-        setBookingError("Please login to make a booking.");
+        setBookingError("You need to log in to make a booking.");
         setBookingState("error");
-        
-        // Trigger the login modal in Navbar
-        window.dispatchEvent(new Event("auth:unauthorized"));
+        setOpenAuth(true);
     };
-
-    useEffect(() => {
-        const onUnauthorized = () => handleAuthRequired();
-        window.addEventListener("auth:unauthorized", onUnauthorized);
-        return () => window.removeEventListener("auth:unauthorized", onUnauthorized);
-    }, []);
 
     useEffect(() => {
         if (calOpen) fetchAvailability(calYear, calMonth);
@@ -472,12 +467,14 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
             setBookingState("loading");
             setBookingError(null);
             try {
-                await bookingService.createBooking(venueId, {
+                const resp = await bookingService.createBooking(venueId, {
                     noOfGuest: guests,
                     startTime: startDateTime,
                     endTime: endDateTime,
                 });
                 setConfirmedRange({ start: startDateTime, end: endDateTime });
+                console.log(resp);
+                window.location.href = `/bookings/${resp.booking.id}/`;
                 setBookingState("success");
             } catch (err) {
                 const msg = err?.message || err?.response?.data?.message || "Something went wrong.";
@@ -502,11 +499,13 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
         setBookingState("loading");
         setBookingError(null);
         try {
-            await bookingService.createBooking(venueId, {
+            const resp = await bookingService.createBooking(venueId, {
                 noOfGuest: guests,
                 startTime: checkIn,
                 endTime: addDays(checkOut, 1),
             });
+            console.log(resp);
+            window.location.href = `/bookings/${resp.booking.id}/`;
             setConfirmedRange({ start: checkIn, end: checkOut });
             setBookingState("success");
         } catch (err) {
@@ -757,12 +756,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                 )}
 
                 {/* Error message */}
-                {/* {bookingState === "error" && bookingError && (
-                    <div className="booking-error">
-                        <span>{bookingError}</span>
-                        <button onClick={() => setBookingState("idle")} aria-label="Dismiss"><MdClose size={14} /></button>
-                    </div>
-                )} */}
+
                 {bookingState === "error" && bookingError && (
                     <div className="booking-error">
                         <span>{bookingError}</span>
@@ -788,6 +782,8 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                     endTimeStr={endTimeStr}
                 />
             </div>
+
+            <AuthModal open={openAuth} onClose={() => setOpenAuth(false)} />
         </>
     );
 }

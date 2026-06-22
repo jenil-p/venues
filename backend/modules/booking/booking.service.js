@@ -1,7 +1,7 @@
 import prisma from '../../prisma/client.js';
 import { isSlotAvailable } from './availability/availability.service.js';
 
-
+// this function is for internal use (not to get exported :)
 function calculateTotalCost(pricingRules, startTime, endTime) {
     const start = new Date(startTime);
     const end   = new Date(endTime);
@@ -27,6 +27,7 @@ function calculateTotalCost(pricingRules, startTime, endTime) {
     throw new Error("No pricing rule found for this venue");
 }
 
+// create booking (make the entry - CART)
 export async function createBooking({ venueId, userId, noOfGuest, startTime, endTime }) {
     // venue exists and is ACTIVE and has enough capacity
     const venue = await prisma.venue.findUnique({
@@ -83,4 +84,81 @@ export async function createBooking({ venueId, userId, noOfGuest, startTime, end
     });
 
     return { booking, expiresAt: null };
+}
+
+
+const PENDING_PAYMENT_TTL_MS = process.env.PENDING_PAYMENT_EXPIRY_MINUTES * 60 * 1000;
+
+// move from CART --> PAYMENT_PENDING state
+export async function proceedToPayment({ bookingId, userId }) {
+    return prisma.$transaction(async (tx) => {
+        const booking = await tx.booking.findUnique({ where: { id: bookingId } });
+
+        if (!booking || booking.userId !== userId) {
+            const err = new Error("Booking not found"); 
+            err.status = 404; 
+            throw err;
+        }
+
+        if (booking.bookingStatus === 'PENDING_PAYMENT') { // if user had closed the payment page, but not cacelled the booking...
+            if (booking.expiresAt && booking.expiresAt > new Date()) {
+                return booking;
+            }
+            const err = new Error("Payment window expired, please re-add to cart");
+            err.status = 409;
+            throw err;
+        }
+
+        if (booking.bookingStatus !== 'CART') {
+            const err = new Error("This booking cannot proceed to payment");
+            err.status = 400; throw err;
+        }
+
+        // this is where the transaction use comes. (to prevent race condition...) for multiple users going to book one slot...
+        const available = await isSlotAvailable(
+            tx, booking.venueId, booking.startTime, booking.endTime
+        );
+        if (!available) {
+            const err = new Error("This slot was just taken by someone else");
+            err.status = 409; throw err;
+        }
+
+        return tx.booking.update({
+            where: { id: bookingId },
+            data: {
+                bookingStatus: 'PENDING_PAYMENT',
+                expiresAt: new Date(Date.now() + PENDING_PAYMENT_TTL_MS),
+            },
+        });
+    });
+}
+
+
+// Cancel booking 
+export async function cancelBooking({ bookingId, userId }) {
+    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+
+    if (!booking || booking.userId !== userId) {
+        const err = new Error("Booking not found"); err.status = 404; throw err;
+    }
+    if (!['CART', 'PENDING_PAYMENT'].includes(booking.bookingStatus)) {
+        const err = new Error("This booking can no longer be cancelled");
+        err.status = 400; throw err;
+    }
+
+    return prisma.booking.update({
+        where: { id: bookingId },
+        data: { bookingStatus: 'CANCELLED', expiresAt: null },
+    });
+}
+
+export async function getBookingById({bookingId, userId}) {
+    bookingId = Number(bookingId);
+    const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+
+    if (!booking || booking.userId !== userId) {
+        const err = new Error("Booking not found"); err.status = 404; throw err;
+    }
+    
+    return booking;
 }

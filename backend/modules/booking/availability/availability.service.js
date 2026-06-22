@@ -35,20 +35,17 @@ export async function fetchBlockedSlots(venueId, windowStart, windowEnd) {
 
 
 export async function isSlotAvailable(tx, venueId, startTime, endTime) {
-    const expiryThreshold = new Date(Date.now() - pending_expiry_minutes * 60 * 1000);
 
     const conflict = await tx.booking.findFirst({
         where: {
             venueId,
-            AND: [
-                { startTime: { lt: endTime } },
-                { endTime:   { gt: startTime } },
-            ],
+            startTime: { lt: endTime },
+            endTime:   { gt: startTime },
             OR: [
                 { bookingStatus: 'CONFIRMED' },
                 {
                     bookingStatus: 'PENDING_PAYMENT',
-                    createdAt:     { gt: expiryThreshold },
+                    expiresAt: { gt: new Date() }
                 },
             ],
         },

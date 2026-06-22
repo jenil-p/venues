@@ -42,3 +42,15 @@ export const makeBookingSchema = z.object({
         message: "Authentication required. Please login first.",
     }),
 });
+
+export const bookingIdValidator = z.object({
+    params: z.object({
+        bookingId: z
+            .string()
+            .regex(/^\d+$/, "bookingId must be a numeric string")
+            .transform(Number),
+    }),
+    user: z.object({
+        id: z.number().int().positive()
+    }).optional().nullable()
+});

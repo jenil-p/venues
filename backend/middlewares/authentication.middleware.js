@@ -7,7 +7,9 @@ export const checkForAuthenticationCookie = (cookieName) => {
 
     if (!token) {
         req.user = null;
-        return next();
+        return res.status(401).json({ 
+            message: "Invalid or expired authentication token. Please login again." 
+        });
     }
 
     if(token){
