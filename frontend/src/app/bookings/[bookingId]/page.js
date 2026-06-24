@@ -109,21 +109,71 @@ const BookingReviewPage = () => {
     return () => clearInterval(interval);
   }, [booking]);
 
+ useEffect(() => {
+    if (typeof window !== 'undefined' && !window.Razorpay) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onerror = () => console.error('Failed to load Razorpay SDK');
+        document.body.appendChild(script);
+
+        return () => {
+            if (document.body.contains(script)) {
+                document.body.removeChild(script);
+            }
+        };
+    }
+}, []);
+
   const handleProceedToPayment = async () => {
     if (proceeding || timeLeft === 'Expired') return;
     setProceeding(true);
 
     try {
-      await bookingService.proceedToPayment(bookingId);
-      toast.success('Moving to payment...');
-      router.push(`/payments/${bookingId}`);
-    } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to proceed to payment';
-      toast.error(msg);
+      const  data  = await bookingService.createPaymentOrder(bookingId);
 
-      if (msg.toLowerCase().includes('expired')) {
-        router.push(`/properties/${booking?.venueId}`);
-      }
+      if (typeof window.Razorpay === 'undefined') {
+            throw new Error("Razorpay SDK not loaded. Please refresh the page.");
+        }
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: venue?.venuename || "Venue Booking",
+        description: `Booking #${bookingId}`,
+        order_id: data.orderId,
+        handler: async (response) => {
+          try {
+            await bookingService.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            toast.success("Payment Successful!");
+            router.push(`/bookings/success/${bookingId}`);
+          } catch (err) {
+            toast.error("Payment verification failed. Contact support.");
+          }
+        },
+
+        modal: {
+          ondismiss: () => {
+              console.log("Razorpay modal closed by user");
+          }
+      },
+      prefill: {
+          name: "Test User",
+          email: "test@example.com",
+      },
+      theme: { color: "#000000" },
+      };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Failed to initiate payment";
+      toast.error(msg);
     } finally {
       setProceeding(false);
     }

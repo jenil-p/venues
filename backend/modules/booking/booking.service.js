@@ -50,7 +50,7 @@ export async function createBooking({ venueId, userId, noOfGuest, startTime, end
 
     // availability check + booking creation inside a transaction (to handle race condition)
     const booking = await prisma.$transaction(async (tx) => {
-        const available = await isSlotAvailable(tx, venueId, new Date(startTime), new Date(endTime));
+        const available = await isSlotAvailable(tx, venueId, new Date(startTime), new Date(endTime), userId);
 
         if (!available) {
             const err = new Error("This slot is already booked for this venue"); err.status = 409; throw err;

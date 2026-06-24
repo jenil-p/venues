@@ -38,6 +38,9 @@ import listserviceRoutes from './modules/offerings/provider/listService.route.js
 import availabilityRouter from './modules/booking/availability/availability.route.js'
 import bookingRutes from './modules/booking/booking.route.js'
 
+// payment
+import paymentRoutes from './modules/payment/payment.route.js';
+
 
 const app = express();
 const PORT = process.env.PORT;
@@ -96,6 +99,9 @@ app.use('/api/v1/admin/services', adminserviceRoutes);
 //booking
 app.use('/api/v1/venues', availabilityRouter);
 app.use('/api/v1/book' , bookingRutes);
+
+// payment
+app.use('/api/v1/payment', paymentRoutes);
 
 
 import dummyLogin from './routes/dlogin.route.js'

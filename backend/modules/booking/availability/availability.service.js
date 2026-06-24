@@ -34,7 +34,7 @@ export async function fetchBlockedSlots(venueId, windowStart, windowEnd) {
 }
 
 
-export async function isSlotAvailable(tx, venueId, startTime, endTime) {
+export async function isSlotAvailable(tx, venueId, startTime, endTime, userId = null) {
 
     const conflict = await tx.booking.findFirst({
         where: {
@@ -48,6 +48,12 @@ export async function isSlotAvailable(tx, venueId, startTime, endTime) {
                     expiresAt: { gt: new Date() }
                 },
             ],
+            NOT: userId ? {
+                AND: [
+                    { userId: userId },
+                    { bookingStatus: 'PENDING_PAYMENT' }
+                ]
+            } : undefined,
         },
     });
 

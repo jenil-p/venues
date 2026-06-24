@@ -25,5 +25,17 @@ export const bookingService = {
 
     getBooking(bookingId){
         return apiClient.get(`/book/booking/${bookingId}`);
+    },
+
+    createPaymentOrder(bookingId) {
+        return apiClient.post('/payment/create-order', { bookingId });
+    },
+
+    verifyPayment({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
+        return apiClient.post('/payment/verify-payment', {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+        });
     }
 };
