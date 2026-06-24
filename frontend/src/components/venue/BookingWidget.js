@@ -449,6 +449,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
         if (isHourly) {
             if (!checkIn) {
                 setCalOpen(true);
+                setBookingState("idle");
                 return;
             }
             const startDateTime = combineDateAndTime(checkIn, startTimeStr);
@@ -456,11 +457,13 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
 
             if (endDateTime <= startDateTime) {
                 setHourlyError("End time must be after start time.");
+                setBookingState("idle");
                 return;
             }
             const dayRanges = getBlockedRangesForDay(checkIn, blockedSlots);
             if (hasTimeOverlap(startDateTime, endDateTime, dayRanges)) {
                 setHourlyError("This time overlaps an existing booking. Please choose another slot.");
+                setBookingState("idle");
                 return;
             }
 
@@ -494,6 +497,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
         // DAILY
         if (!checkIn || !checkOut) {
             setCalOpen(true);
+            setBookingState("idle");
             return;
         }
         setBookingState("loading");
