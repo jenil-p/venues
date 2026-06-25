@@ -89,51 +89,6 @@ export async function createBooking({ venueId, userId, noOfGuest, startTime, end
 
 const PENDING_PAYMENT_TTL_MS = process.env.PENDING_PAYMENT_EXPIRY_MINUTES * 60 * 1000;
 
-// move from CART --> PAYMENT_PENDING state
-export async function proceedToPayment({ bookingId, userId }) {
-    return prisma.$transaction(async (tx) => {
-        const booking = await tx.booking.findUnique({ where: { id: bookingId } });
-
-        if (!booking || booking.userId !== userId) {
-            const err = new Error("Booking not found"); 
-            err.status = 404; 
-            throw err;
-        }
-
-        if (booking.bookingStatus === 'PENDING_PAYMENT') { // if user had closed the payment page, but not cacelled the booking...
-            if (booking.expiresAt && booking.expiresAt > new Date()) {
-                return booking;
-            }
-            const err = new Error("Payment window expired, please re-add to cart");
-            err.status = 409;
-            throw err;
-        }
-
-        if (booking.bookingStatus !== 'CART') {
-            const err = new Error("This booking cannot proceed to payment");
-            err.status = 400; throw err;
-        }
-
-        // this is where the transaction use comes. (to prevent race condition...) for multiple users going to book one slot...
-        const available = await isSlotAvailable(
-            tx, booking.venueId, booking.startTime, booking.endTime
-        );
-        if (!available) {
-            const err = new Error("This slot was just taken by someone else");
-            err.status = 409; throw err;
-        }
-
-        return tx.booking.update({
-            where: { id: bookingId },
-            data: {
-                bookingStatus: 'PENDING_PAYMENT',
-                expiresAt: new Date(Date.now() + PENDING_PAYMENT_TTL_MS),
-            },
-        });
-    });
-}
-
-
 // Cancel booking 
 export async function cancelBooking({ bookingId, userId }) {
     const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
@@ -161,4 +116,54 @@ export async function getBookingById({bookingId, userId}) {
     }
     
     return booking;
+}
+
+export async function getUserBookings({ userId, status = null, limit = 20, page = 1 }) {
+    const skip = (page - 1) * limit;
+
+    const where = {
+        userId,
+        NOT: {
+            bookingStatus: { in: ['CART', 'PENDING_PAYMENT'] }
+        }
+    };
+
+    if (status) {
+        where.bookingStatus = status;
+    }
+
+    const bookings = await prisma.booking.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+            venue: {
+                select: {
+                    id: true,
+                    venuename: true,
+                    photos: { take: 1, orderBy: { order: 'asc' } },
+                    address: {
+                        select: {
+                            city: { select: { name: true } },
+                            location: true
+                        }
+                    }
+                }
+            },
+            payment: true,
+        }
+    });
+
+    const total = await prisma.booking.count({ where });
+
+    return {
+        bookings,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
 }

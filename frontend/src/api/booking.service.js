@@ -27,6 +27,10 @@ export const bookingService = {
         return apiClient.get(`/book/booking/${bookingId}`);
     },
 
+    getUserBookings(){
+        return apiClient.get(`/book/my-bookings`);
+    },
+
     createPaymentOrder(bookingId) {
         return apiClient.post('/payment/create-order', { bookingId });
     },

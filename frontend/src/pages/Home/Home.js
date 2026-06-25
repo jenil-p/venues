@@ -11,15 +11,15 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   // Smooth Scroll Setup
-  useEffect(() => {
-    const lenis = new Lenis();
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-    return () => lenis.destroy();
-  }, []);
+  // useEffect(() => {
+  //   const lenis = new Lenis();
+  //   function raf(time) {
+  //     lenis.raf(time);
+  //     requestAnimationFrame(raf);
+  //   }
+  //   requestAnimationFrame(raf);
+  //   return () => lenis.destroy();
+  // }, []);
 
   // Data Fetching
   useEffect(() => {
@@ -28,6 +28,7 @@ const Home = () => {
         setLoading(true);
         const response = await venueService.getVenues();
         setVenues(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching venues:", error);
       } finally {

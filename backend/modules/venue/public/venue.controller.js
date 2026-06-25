@@ -12,8 +12,7 @@ export async function getVenues(req, res) {
                     where: { order: 1 }
                 },
                 pricing: {
-                    select: { price: true },
-                    where: { unit: "DAILY" }
+                    select: { price: true, unit: true },
                 },
                 address: {
                     select:{

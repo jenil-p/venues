@@ -134,7 +134,7 @@ const MyVenuesPage = () => {
                                     <span className="flex items-center gap-1">
                                         <FaUsers className="text-blue-500" size={12} />
                                         {venue.capacity || 0} Guests
-                                        {console.log(venue)}
+                                        {/* {console.log(venue)} */}
                                     </span>
                                 </div>
                                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">

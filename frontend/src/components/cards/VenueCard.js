@@ -12,6 +12,7 @@ const VenueCard = ({ venue }) => {
   const id = venue.id; 
   const imageSrc = venue.photos?.[0]?.image || '/placeholder.jpg';
   const price = venue.pricing?.[0]?.price || 0;
+  const priceUnit = venue.pricing?.[0]?.unit || "DAILY";
   const rating = venue.rating || 0;
   const name = venue.venuename || "Untitled Venue";
   const location = venue.address.location;
@@ -83,7 +84,7 @@ const VenueCard = ({ venue }) => {
           <span className="font-semibold text-gray-900 text-[15px]">
             {formatPrice(price)}
           </span>
-          <span className="text-gray-900 font-light text-[15px]">day</span>
+          <span className="text-gray-900 font-light text-[15px]">{(priceUnit == "DAILY")? "day" : "hour"}</span>
         </div>
       </div>
     </div>

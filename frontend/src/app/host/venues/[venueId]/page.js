@@ -26,9 +26,9 @@ const HostVenueDetailsPage = ({ params }) => {
         if (!id) return;
         try {
             setLoading(true);
-            console.log("sending request to " , id)
+            // console.log("sending request to " , id)
             const res = await providerService.getVenue(id);
-            console.log(res)
+            // console.log(res)
             setVenue(res.venue);
         } catch (error) {
             console.error(error);

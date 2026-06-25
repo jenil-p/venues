@@ -91,18 +91,7 @@ const Navbar = () => {
             <Link href="/" className="cursor-pointer">
               <h1 className="text-rose-500 font-bold text-2xl">VenueFinder</h1>
             </Link>
-
-            {/* Middle Menu (Hidden on mobile) */}
-            <div className="hidden md:block">
-              <ul className="flex items-center gap-8 text-sm font-medium text-gray-600">
-                <li className="hover:text-black transition cursor-pointer">
-                  <Link href="/properties">Find Venue</Link>
-                </li>
-                <li className="hover:text-black transition cursor-pointer">Inspirations</li>
-                <li className="hover:text-black transition cursor-pointer">Booking Guide</li>
-              </ul>
-            </div>
-
+            
             {/* Right Section */}
             <div className="flex items-center gap-4 relative" ref={menuRef}>
 
@@ -161,7 +150,7 @@ const Navbar = () => {
                           </>
                         )}
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/messages')}>Messages</div>
-                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/reservations')}>My Bookings</div>
+                        <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookings')}>My Bookings</div>
                         <div className="px-4 py-3 hover:bg-neutral-100 font-semibold transition" onClick={() => router.push('/bookmarks')}>Saved</div>
                         <hr />
                         <div className="px-4 py-3 hover:bg-neutral-100 transition" onClick={logout}>Logout</div>
