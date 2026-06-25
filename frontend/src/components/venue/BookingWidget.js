@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { bookingService } from "@/api/booking.service";
 import { FaStar, FaChevronLeft, FaChevronRight, FaSpinner } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdClose } from "react-icons/md";
 import { useAuth } from "@/context/AuthContext";
 import AuthModal from "@/components/auth/AuthModal.js"
@@ -534,7 +535,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
             <>
                 <style>{widgetStyles}</style>
                 <div className="widget success-state">
-                    <div className="success-icon">✓</div>
+                    <div className="success-icon"> <IoMdCheckmarkCircleOutline/> </div>
                     <h3 className="success-title">Booking Requested!</h3>
                     <p className="success-sub">
                         Your request has been submitted. You'll hear back from the venue shortly.

@@ -23,6 +23,10 @@ export const bookingService = {
         return apiClient.delete(`/book/booking/${bookingId}`);
     },
 
+    revertToCart(bookingId) {
+        return apiClient.patch(`/book/booking/${bookingId}`);
+    },
+
     getBooking(bookingId){
         return apiClient.get(`/book/booking/${bookingId}`);
     },

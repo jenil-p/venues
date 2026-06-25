@@ -51,6 +51,7 @@ export async function getVenue(req, res) {
                 contactemail: true,
                 contactnumber1: true,
                 rating: true,
+                providerId: true,
     
                 address: {
                     select: {

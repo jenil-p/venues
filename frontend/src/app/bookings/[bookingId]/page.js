@@ -3,14 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import FooterDiv from '@/components/Footer';
 import { bookingService } from '@/api/booking.service';
 import { venueService } from '@/api/venue.service';
-import {
-  FaClock, FaCalendarAlt, FaUsers, FaMapMarkerAlt, FaArrowLeft,
-  FaCheckCircle, FaTimesCircle, FaCreditCard, FaExclamationTriangle 
-} from 'react-icons/fa';
+import { providerService } from '@/api/provider.service';
 import { toast } from 'react-hot-toast';
+
+import BookingDetailSkeleton from '@/components/booking/BookingDetailSkeleton.js';
+
+import { IoCheckmarkCircleOutline } from "react-icons/io5";
+import { LuDownload } from "react-icons/lu";
+import { SlLocationPin } from "react-icons/sl";
+import { PiWarningCircle } from "react-icons/pi";
+import { RxCrossCircled } from "react-icons/rx";
+import { RxPeople } from "react-icons/rx";
+import { WiTime4 } from "react-icons/wi";
+import { FiShield } from 'react-icons/fi';
+
+
+import PriceSummary from '@/components/booking/PriceSummary';
+import AmenitiesList from '@/components/booking/AmenitiesList';
+import HostDetails from '@/components/booking/HostDetails';
 
 const BookingDetailPage = () => {
   const router = useRouter();
@@ -19,22 +31,34 @@ const BookingDetailPage = () => {
 
   const [booking, setBooking] = useState(null);
   const [venue, setVenue] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [timeLeft, setTimeLeft] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [proceeding, setProceeding] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
-  // Fetch Data
+  // Fetch Data Sequence
   useEffect(() => {
     const fetchData = async () => {
       try {
         const bookingRes = await bookingService.getBooking(bookingId);
         const bookingData = bookingRes?.data || bookingRes;
-
         setBooking(bookingData);
 
         const venueRes = await venueService.getVenue(bookingData.venueId);
-        setVenue(venueRes?.data || venueRes);
+        const venueData = venueRes?.data || venueRes;
+        setVenue(venueData);
+
+        // Fetch Host Provider data via API safely
+        if (venueData?.providerId) {
+          try {
+            const providerRes = await providerService.getProvider(venueData.providerId);
+            setProvider(providerRes?.provider || providerRes?.data || providerRes);
+          } catch (pErr) {
+            console.error("Provider data failed to load smoothly", pErr);
+          }
+        }
       } catch (err) {
         setError({
           title: "Booking Not Found",
@@ -49,7 +73,7 @@ const BookingDetailPage = () => {
     if (bookingId) fetchData();
   }, [bookingId]);
 
-  // Countdown for PENDING_PAYMENT
+  // Countdown timer logic
   useEffect(() => {
     if (!booking?.expiresAt || booking.bookingStatus !== 'PENDING_PAYMENT') return;
 
@@ -57,6 +81,7 @@ const BookingDetailPage = () => {
       const diff = new Date(booking.expiresAt).getTime() - Date.now();
       if (diff <= 0) {
         setTimeLeft('Expired');
+        clearInterval(interval);
         return;
       }
       const min = Math.floor(diff / 60000);
@@ -67,7 +92,7 @@ const BookingDetailPage = () => {
     return () => clearInterval(interval);
   }, [booking]);
 
-  // Razorpay Script
+  // Load Razorpay Script
   useEffect(() => {
     if (typeof window !== 'undefined' && !window.Razorpay) {
       const script = document.createElement('script');
@@ -76,8 +101,6 @@ const BookingDetailPage = () => {
       document.body.appendChild(script);
     }
   }, []);
-
-  const isPendingPayment = booking?.bookingStatus === 'PENDING_PAYMENT' || booking?.bookingStatus === 'CART';
 
   const handleProceedToPayment = async () => {
     if (proceeding || timeLeft === 'Expired') return;
@@ -105,29 +128,22 @@ const BookingDetailPage = () => {
               razorpay_signature: response.razorpay_signature,
             });
             toast.success("Payment Successful!");
-            window.location.href = `/bookings/${bookingId}/`;
+            window.location.reload();
           } catch (err) {
             toast.error("Payment verification failed. Contact support.");
-          }
-        },
-
-        modal: {
-          ondismiss: () => {
-            console.log("Razorpay modal closed by user");
           }
         },
         prefill: {
           name: "Test User",
           email: "test@example.com",
         },
-        theme: { color: "#000000" },
+        theme: { color: "#122B1E" },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      const msg = err?.response?.data?.message || "Failed to initiate payment";
-      toast.error(msg);
+      toast.error(err?.response?.data?.message || "Failed to initiate payment");
     } finally {
       setProceeding(false);
     }
@@ -136,10 +152,14 @@ const BookingDetailPage = () => {
   const handleCancel = async () => {
     if (cancelling) return;
     setCancelling(true);
-
     try {
-      await bookingService.cancelBooking(bookingId);
-      toast.success('Booking cancelled successfully');
+      if (['CART', 'PENDING_PAYMENT'].includes(booking.bookingStatus)) {
+        const ress = await bookingService.revertToCart(bookingId);
+        toast.success('Booking moved back to cart');
+      } else {
+        await bookingService.cancelBooking(bookingId);
+        toast.success('Booking cancelled');
+      }
       router.push(`/properties/${booking?.venueId || ''}`);
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to cancel booking');
@@ -149,21 +169,16 @@ const BookingDetailPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-zinc-900"></div>
-      </div>
-    );
+    return <BookingDetailSkeleton/>
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <FaExclamationTriangle className="mx-auto text-7xl text-red-500 mb-6" />
-          <h1 className="text-3xl font-semibold mb-3">{error.title}</h1>
-          <p className="text-zinc-600 mb-8">{error.message}</p>
-          <button onClick={() => router.push('/')} className="px-8 py-3.5 bg-black text-white rounded-2xl font-medium">
+          <h1 className="text-2xl font-serif mb-2">{error.title}</h1>
+          <p className="text-zinc-500 mb-6">{error.message}</p>
+          <button onClick={() => router.push('/')} className="px-6 py-3 bg-black text-white rounded-xl font-medium">
             Go Home
           </button>
         </div>
@@ -171,156 +186,180 @@ const BookingDetailPage = () => {
     );
   }
 
-  const startDate = new Date(booking.startTime);
-  const endDate = new Date(booking.endTime);
-  const isHourly = booking.pricePerUnit?.unit === 'HOURLY' || false;
+  const startDate = new Date(booking.startTime || '2025-07-12T09:00:00');
+  const endDate = new Date(booking.endTime || '2025-07-13T22:00:00');
 
   return (
-    <div className="bg-zinc-50 min-h-screen">
+    <div className="bg-[#FAF8F5] min-h-screen font-sans text-[#1C1917] antialiased">
       <Navbar />
 
-      <main className="max-w-5xl mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-12 space-y-8">
+        
+        {/* Top Minimal Action Bar */}
+        <div className="flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-zinc-500 hover:text-black transition"
+            className="flex items-center gap-1.5 text-sm text-[#78716C] hover:text-black transition font-medium"
           >
-            <FaArrowLeft /> Back
+            <span>&larr;</span> Back
           </button>
-
-          <div className="flex items-center gap-3">
-            <span className={`px-4 py-1.5 rounded-full text-sm font-medium 
-                            ${booking.bookingStatus === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
-                booking.bookingStatus === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                  'bg-amber-100 text-amber-700'}`}>
-              {booking.bookingStatus}
-            </span>
-          </div>
+          <span className="text-xs font-mono uppercase tracking-widest text-[#A8A29E]">BKG-2847-XQ</span>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-10">
-          {/* Left - Main Content */}
-          <div className="lg:col-span-7 space-y-10">
+        {/* Global Dynamic Status State Banners */}
+        {booking.bookingStatus === 'CONFIRMED' && (
+          <div className="bg-[#1A3D2B] text-white p-6 rounded-2xl flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full flex items-center justify-center text-[#6ebf8b] font-bold text-2xl"><IoCheckmarkCircleOutline/></div>
+              <div>
+                <h3 className="font-semibold text-base">Booking Confirmed</h3>
+                <p className="text-xs text-zinc-300 font-mono mt-0.5">Confirmation code: MRD-7241-SF</p>
+              </div>
+            </div>
+            <button className="flex items-center gap-2 bg-[#1A3D2B] hover:bg-[#23533A] text-sm font-medium py-2 px-4 rounded-xl transition border border-[#2A6647]">
+              <span><LuDownload/></span> Receipt
+            </button>
+          </div>
+        )}
+
+        {booking.bookingStatus === 'CANCELLED' && (
+          <div className="bg-[#FDF2F2] border border-[#FDE8E8] text-[#9B1C1C] p-5 rounded-2xl flex items-center gap-3 shadow-sm">
+            <span className="text-lg">✕</span>
             <div>
-              <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 mb-2">
-                {venue?.venuename}
-              </h1>
-              <p className="flex items-center gap-2 text-zinc-600">
-                <FaMapMarkerAlt />
-                {venue?.address?.city?.name}, {venue?.address?.city?.state?.name}
-              </p>
+              <h3 className="font-semibold text-sm">Booking Cancelled</h3>
+              <p className="text-xs text-[#C81E1E] mt-0.5">This booking has been cancelled. Any applicable refund will appear within 5-7 business days.</p>
+            </div>
+          </div>
+        )}
+
+        {/* 2-Column Dashboard Grid Layout */}
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Main Content Side */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Visual Hero Feature */}
+            <div className="relative rounded-3xl overflow-hidden group border border-[#EBE6DD]">
+              <img
+                src={venue?.photos?.[0]?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"}
+                alt={venue?.venuename}
+                className="w-full h-[340px] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex flex-col justify-end">
+                <span className="text-[10px] font-mono tracking-widest text-[#FAF8F5]/80 uppercase mb-1">CREATIVE STUDIO & EVENT SPACE</span>
+                <h1 className="text-3xl font-serif text-white font-medium tracking-wide">{venue?.venuename || "The Meridian Loft"}</h1>
+                <p className="text-xs text-zinc-300 mt-1 flex items-center gap-1">
+                  <span> <SlLocationPin/> </span> {venue?.address?.location || "Hayes Valley, San Francisco, CA"}
+                </p>
+                <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-[#1C1917] flex items-center gap-1">
+                  ★ 4.9 <span className="text-[#78716C] font-normal font-sans text-[10px]">({venue?.reviews?.length || 127})</span>
+                </div>
+              </div>
             </div>
 
-            {/* Booking Info Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                <FaCalendarAlt /> Reservation Details
-              </h2>
+            {/* Structured Core Details Card */}
+            <div className="bg-white rounded-3xl border border-[#EBE6DD] p-8 space-y-8 shadow-sm">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-serif font-medium text-[#1C1917]">Booking Details</h2>
+                {booking.bookingStatus === 'PENDING_PAYMENT' && (
+                  <span className="bg-[#FFF8E6] text-[#B27B00] px-3 py-1 rounded-full text-sm font-medium border border-[#FFE099] flex items-center gap-1">
+                    <PiWarningCircle/> Awaiting Payment
+                  </span>
+                )}
+                {booking.bookingStatus === 'CONFIRMED' && (
+                  <span className="bg-[#E6F4EA] text-[#1e402e] px-3 py-1 rounded-full text-sm font-medium border border-[#CEEAD6] flex items-center gap-1">
+                    <IoCheckmarkCircleOutline/> Confirmed
+                  </span>
+                )}
+                {booking.bookingStatus === 'CANCELLED' && (
+                  <span className="bg-[#FCE8E6] text-[#C5221F] px-3 py-1 rounded-full text-sm font-medium border border-[#FAD2CF] flex items-center gap-1">
+                    <RxCrossCircled/> Cancelled
+                  </span>
+                )}
+              </div>
 
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid sm:grid-cols-2 gap-6 bg-[#FAF8F5] rounded-2xl p-5 border border-[#EBE6DD]">
                 <div>
-                  <p className="text-zinc-500 text-sm mb-1">CHECK-IN</p>
-                  <p className="text-xl font-medium">
-                    {startDate.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">CHECK-IN</p>
+                  <p className="text-base font-semibold text-[#1C1917]">
+                    {startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
-                  <p className="text-zinc-600 mt-1">
+                  <p className="text-sm text-[#78716C] mt-0.5">
                     {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
-
                 <div>
-                  <p className="text-zinc-500 text-sm mb-1">CHECK-OUT</p>
-                  <p className="text-xl font-medium">
-                    {endDate.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">CHECK-OUT</p>
+                  <p className="text-base font-semibold text-[#1C1917]">
+                    {endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
-                  <p className="text-zinc-600 mt-1">
+                  <p className="text-sm text-[#78716C] mt-0.5">
                     {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t flex items-center gap-4">
-                <FaUsers className="text-2xl text-zinc-400" />
+              <div className="grid sm:grid-cols-2 gap-6 pt-2">
                 <div>
-                  <p className="font-medium">{booking.numberOfGuestsExpected} Guests</p>
+                  <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">GUESTS</p>
+                  <p className="text-base font-medium text-[#1C1917] flex items-center gap-2">
+                    <span className="text-lg"> <RxPeople/> </span> {booking.numberOfGuestsExpected || 24} attendees
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">DURATION</p>
+                  <p className="text-base font-medium text-[#1C1917] flex items-center gap-2">
+                    <span className="text-lg"> <WiTime4/> </span> {booking.durationHours || 13} hours
+                  </p>
                 </div>
               </div>
+
+              <div className="space-y-1.5 pt-2">
+                <p className="text-[10px] font-mono tracking-wider text-[#A8A29E]">EVENT PURPOSE</p>
+                <p className="text-base text-[#44403C] font-medium bg-[#FAF8F5] p-4 rounded-xl border border-[#EBE6DD]">
+                  {booking.purpose || "Corporate team offsite & product strategy workshop"}
+                </p>
+              </div>
+
+              {/* Dynamic Managed Amenities Module */}
+              <AmenitiesList features={venue?.features} />
             </div>
 
-            {/* Venue Photos / Gallery (Premium Touch) */}
-            {venue?.photos?.length > 0 && (
-              <div className="bg-white rounded-3xl overflow-hidden border border-zinc-100">
-                <img
-                  src={venue.photos[0].url || venue.photos[0].image}
-                  alt={venue.venuename}
-                  className="w-full h-[420px] object-cover"
-                />
+            {/* Conditional Cancellation Policy Segment */}
+            {booking.bookingStatus !== 'CANCELLED' && (
+              <div className="bg-white rounded-3xl border border-[#EBE6DD] p-6 flex gap-4 items-start shadow-sm">
+                <div className="font-bold text-2xl pt-2 text-zinc-400">
+                  <FiShield/>
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-[#1C1917]">Cancellation Policy</h4>
+                  <p className="text-sm text-[#57534E] mt-0.5">Free cancellation until Jul 5, 2025. After that, 50% refund only.</p>
+                </div>
               </div>
             )}
+
+            {/* Condition: Render Host below main section for Confirmed / Cancelled status views */}
+            {booking.bookingStatus !== 'PENDING_PAYMENT' && (
+              <HostDetails provider={provider} />
+            )}
+
           </div>
 
-          {/* Right Sidebar - Summary + Actions */}
-          <div className="lg:col-span-5">
-            <div className="bg-white rounded-3xl shadow-xl p-8 sticky top-8">
-              <div className="flex justify-between items-baseline mb-8">
-                <div>
-                  <span className="text-5xl font-semibold tracking-tighter">₹{Number(booking.totalCost).toLocaleString('en-IN')}</span>
-                  <p className="text-sm text-zinc-500 mt-1">Total Amount</p>
-                </div>
-                {isPendingPayment && (
-                  <div className="text-right">
-                    <div className="flex items-center gap-2 text-amber-600 font-medium">
-                      <FaClock /> {timeLeft || '--:--'}
-                    </div>
-                    <p className="text-xs text-zinc-500">minutes left</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="space-y-3 py-6 border-y text-sm">
-                <div className="flex justify-between">
-                  <span>₹{Number(booking.pricePerUnit).toLocaleString('en-IN')} × {isHourly ? 'hours' : 'days'}</span>
-                  <span>₹{Number(booking.totalCost).toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-emerald-600">
-                  <span>Service Fee</span>
-                  <span>₹0</span>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              {isPendingPayment ? (
-                <button
-                  onClick={handleProceedToPayment}
-                  disabled={proceeding || timeLeft === 'Expired'}
-                  className="w-full mt-8 bg-gradient-to-r from-black to-zinc-900 hover:from-zinc-900 hover:to-black text-white py-4 rounded-2xl font-semibold text-lg transition-all active:scale-[0.985]"
-                >
-                  {proceeding ? 'Processing Payment...' : 'Proceed to Secure Payment'}
-                </button>
-              ) : (
-                <div className="mt-8 flex items-center gap-3 text-emerald-600 justify-center py-4 bg-emerald-50 rounded-2xl">
-                  <FaCheckCircle className="text-xl" />
-                  <span className="font-medium">Booking Confirmed</span>
-                </div>
-              )}
-
-              {/* Cancel Button (only for pending) */}
-              {isPendingPayment && (
-                <button
-                  onClick={handleCancel}
-                  className="w-full mt-4 text-red-600 hover:bg-red-50 py-4 rounded-2xl font-medium transition"
-                >
-                  Cancel Booking
-                </button>
-              )}
-            </div>
+          {/* Pricing Actions Sidebar */}
+          <div className="lg:col-span-5 lg:sticky lg:top-8">
+            <PriceSummary
+              booking={booking}
+              isPendingPayment={booking.bookingStatus === 'PENDING_PAYMENT'}
+              proceeding={proceeding}
+              timeLeft={timeLeft}
+              handleProceedToPayment={handleProceedToPayment}
+              handleCancel={handleCancel}
+              cancelling={cancelling}
+            />
           </div>
+
         </div>
       </main>
-
-      <FooterDiv />
     </div>
   );
 };

@@ -128,3 +128,33 @@ export async function myProviderProfile(req, res) {
     return res.status(500).json({ message: "Error occurred", error: err.message });
   }
 }
+
+export async function getProviderInfo(req, res, next) {
+  try {
+    const { providerId } = req.params;
+
+    const provider = await prisma.providerProfile.findUnique({
+      where: { id: Number(providerId) },
+      select: {
+        id: true,
+        userId: true,
+        legalname: true,
+        contact1: true,
+        contact2: true,
+        photo: true,
+      }
+    });
+
+    if (!provider) {
+      return res.status(404).json({ message: "provider not found." });
+    }
+
+    res.status(200).json({ provider });
+
+    req.objectId = provider.id;
+
+    next();
+  } catch (err) {
+    return res.status(500).json({ message: "error getting provider", err });
+  }
+}

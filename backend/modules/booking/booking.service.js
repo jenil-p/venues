@@ -87,23 +87,60 @@ export async function createBooking({ venueId, userId, noOfGuest, startTime, end
 }
 
 
-const PENDING_PAYMENT_TTL_MS = process.env.PENDING_PAYMENT_EXPIRY_MINUTES * 60 * 1000;
-
-// Cancel booking 
 export async function cancelBooking({ bookingId, userId }) {
+    const booking = await prisma.booking.findUnique({ 
+        where: { id: bookingId } 
+    });
+
+    if (!booking || booking.userId !== userId) {
+        const err = new Error("Booking not found"); 
+        err.status = 404; 
+        throw err;
+    }
+
+    const now = new Date();
+    if (booking.bookingStatus === 'CONFIRMED' && new Date(booking.startTime) <= now) {
+        const err = new Error("The slot duration has already started and cannot be cancelled.");
+        err.status = 400; 
+        throw err;
+    }
+
+    // if booking is in cart/pending payment stage then it has to be converted into CART back not cancel...
+    if(['CART', 'PENDING_PAYMENT'].includes(booking.bookingStatus)){
+        const err = new Error("This booking can not be cancelled");
+        err.status = 400; 
+        throw err; 
+    }
+
+    if (booking.bookingStatus !== 'CONFIRMED') {
+        const err = new Error("This booking can no longer be cancelled");
+        err.status = 400; 
+        throw err;
+    }
+
+    return prisma.booking.update({
+        where: { id: bookingId },
+        data: { 
+            bookingStatus: 'CANCELLED', 
+            expiresAt: null 
+        },
+    });
+}
+
+export async function revertToCart({ bookingId, userId }) {
     const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
 
     if (!booking || booking.userId !== userId) {
         const err = new Error("Booking not found"); err.status = 404; throw err;
     }
-    if (!['CART', 'PENDING_PAYMENT'].includes(booking.bookingStatus)) {
-        const err = new Error("This booking can no longer be cancelled");
+    if (!['CART', 'PENDING_PAYMENT'].includes(booking.bookingStatus)) { // here only PENDING_PAYMENT is nessesory... but CART is just in case...
+        const err = new Error("This booking can no longer be converted to cart");
         err.status = 400; throw err;
     }
 
     return prisma.booking.update({
         where: { id: bookingId },
-        data: { bookingStatus: 'CANCELLED', expiresAt: null },
+        data: { bookingStatus: 'CART', expiresAt: null },
     });
 }
 
@@ -118,8 +155,7 @@ export async function getBookingById({bookingId, userId}) {
     return booking;
 }
 
-export async function getUserBookings({ userId, status = null, limit = 20, page = 1 }) {
-    const skip = (page - 1) * limit;
+export async function getUserBookings({ userId, status = null }) {
 
     const where = {
         userId,
@@ -135,8 +171,6 @@ export async function getUserBookings({ userId, status = null, limit = 20, page 
     const bookings = await prisma.booking.findMany({
         where,
         orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
         include: {
             venue: {
                 select: {
@@ -155,15 +189,5 @@ export async function getUserBookings({ userId, status = null, limit = 20, page 
         }
     });
 
-    const total = await prisma.booking.count({ where });
-
-    return {
-        bookings,
-        pagination: {
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit)
-        }
-    };
+    return { bookings };
 }

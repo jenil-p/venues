@@ -1,7 +1,7 @@
-import { createBooking, cancelBooking, getBookingById, getUserBookings } from './booking.service.js';
+import { createBooking, cancelBooking, revertToCart, getBookingById, getUserBookings } from './booking.service.js';
 
 export async function makeBooking(req, res) {
-    // try {
+    try {
         const { venueId } = req.params;
         const userId = req.user.id;
         const { noOfGuest, startTime, endTime } = req.body;
@@ -10,15 +10,14 @@ export async function makeBooking(req, res) {
 
         return res.status(201).json(result);
 
-    // } catch (error) {
-    //     if (error.status) {
-    //         return res.status(error.status).json({ message: error.message });
-    //     }
-    //     console.error("makeBooking error:", error);
-    //     return res.status(500).json({ message: "Internal server error" });
-    // }
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ message: error.message });
+        }
+        console.error("makeBooking error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 }
-
 
 export async function cancelBookingController(req, res) {
   try {
@@ -27,6 +26,20 @@ export async function cancelBookingController(req, res) {
 
     const result = await cancelBooking({ bookingId, userId });
     return res.status(200).json({ message: "Booking cancelled", booking: result });
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ message: error.message });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function revertToCartController(req, res) {
+  try {
+    const { bookingId } = req.params;
+    const userId = req.user.id;
+
+    const result = await revertToCart({ bookingId, userId });
+    console.log(result);
+    return res.status(200).json({ message: "Booking reverted to cart", booking: result });
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });
     return res.status(500).json({ message: "Internal server error" });

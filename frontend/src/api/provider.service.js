@@ -9,6 +9,9 @@ export const providerService = {
     getProviderRequestStatus() {
         return apiClient.get("/providers/me");
     },
+    getProvider(providerId){
+        return apiClient.get(`/providers/${providerId}`);
+    },
 
     // venue things...
     listFillVenue(data) {
