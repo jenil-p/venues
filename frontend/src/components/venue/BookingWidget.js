@@ -476,7 +476,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                     endTime: endDateTime,
                 });
                 setConfirmedRange({ start: startDateTime, end: endDateTime });
-                console.log(resp);
+                // console.log(resp);
                 window.location.href = `/bookings/${resp.booking.id}/`;
                 setBookingState("success");
             } catch (err) {
@@ -508,7 +508,7 @@ export default function BookingWidget({ price, rating, venueId, unit = "DAILY" }
                 startTime: checkIn,
                 endTime: addDays(checkOut, 1),
             });
-            console.log(resp);
+            // console.log(resp);
             window.location.href = `/bookings/${resp.booking.id}/`;
             setConfirmedRange({ start: checkIn, end: checkOut });
             setBookingState("success");

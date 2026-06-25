@@ -8,7 +8,7 @@ import { bookingService } from '@/api/booking.service';
 import { venueService } from '@/api/venue.service';
 import {
   FaClock, FaCalendarAlt, FaUsers, FaMapMarkerAlt, FaArrowLeft,
-  FaCheckCircle, FaTimesCircle, FaCreditCard
+  FaCheckCircle, FaTimesCircle, FaCreditCard, FaExclamationTriangle 
 } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 
@@ -77,7 +77,7 @@ const BookingDetailPage = () => {
     }
   }, []);
 
-  const isPendingPayment = booking?.bookingStatus === 'PENDING_PAYMENT';
+  const isPendingPayment = booking?.bookingStatus === 'PENDING_PAYMENT' || booking?.bookingStatus === 'CART';
 
   const handleProceedToPayment = async () => {
     if (proceeding || timeLeft === 'Expired') return;
@@ -105,7 +105,7 @@ const BookingDetailPage = () => {
               razorpay_signature: response.razorpay_signature,
             });
             toast.success("Payment Successful!");
-            router.push(`/bookings/${bookingId}`);
+            window.location.href = `/bookings/${bookingId}/`;
           } catch (err) {
             toast.error("Payment verification failed. Contact support.");
           }

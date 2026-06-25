@@ -28,7 +28,7 @@ const Home = () => {
         setLoading(true);
         const response = await venueService.getVenues();
         setVenues(response.data);
-        console.log(response.data);
+        // console.log(response.data);
       } catch (error) {
         console.error("Error fetching venues:", error);
       } finally {
