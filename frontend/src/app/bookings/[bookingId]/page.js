@@ -299,6 +299,8 @@ const BookingDetailPage = () => {
                 </div>
               </div>
 
+              {/* Yet to make this dynamic....................................................... */}
+
               <div className="grid sm:grid-cols-2 gap-6 pt-2">
                 <div>
                   <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">GUESTS</p>
@@ -320,6 +322,8 @@ const BookingDetailPage = () => {
                   {booking.purpose || "Corporate team offsite & product strategy workshop"}
                 </p>
               </div>
+
+              {/* till here................................................................................ */}
 
               {/* Dynamic Managed Amenities Module */}
               <AmenitiesList features={venue?.features} />

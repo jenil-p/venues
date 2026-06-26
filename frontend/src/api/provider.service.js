@@ -4,13 +4,13 @@ export const providerService = {
 
     // become a provider...
     makeRequestToBeProvider(data) {
-        return apiClient.post("/providers", data);
+        return apiClient.post("/providers-profile", data);
     },
     getProviderRequestStatus() {
-        return apiClient.get("/providers/me");
+        return apiClient.get("/providers-profile/me");
     },
     getProvider(providerId){
-        return apiClient.get(`/providers/${providerId}`);
+        return apiClient.get(`/providers-profile/${providerId}`);
     },
 
     // venue things...

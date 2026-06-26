@@ -25,8 +25,7 @@ import providerRoutes from './modules/provider/provider.route.js';
 
 // Venue
 import adminvenueRoutes from './modules/venue/admin/adminVenue.route.js';
-import listvenueRoutes from './modules/venue/provider/listVenue.route.js';
-import updatevenueRoutes from './modules/venue/provider/venue.route.js';
+import manageVenuesRoutes from './modules/venue/provider/venue.route.js';
 import uservenueRoutes from './modules/venue/public/venue.routes.js'
 
 // Offerings - (services)
@@ -77,13 +76,12 @@ app.use('/api/v1/resources' , getResourceRoutes);
 
 
 // provider
-app.use('/api/v1/providers' , providerRoutes);
+app.use('/api/v1/providers-profile/' , providerRoutes);
 app.use('/api/v1/admin/providers' , adminProviderRoutes);
 
 
 // Venue
-app.use('/api/v1/providers/venues', listvenueRoutes); // first time listing 
-app.use('/api/v1/providers/venues', updatevenueRoutes); // updating its details ...
+app.use('/api/v1/providers/venues', manageVenuesRoutes); // updating its details ...
 app.use('/api/v1/admin/venues', adminvenueRoutes);
 app.use('/api/v1/venues', uservenueRoutes);
 

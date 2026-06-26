@@ -4,12 +4,16 @@ import { checkForAuthenticationCookie } from "../../../middlewares/authenticatio
 import { hasPermission } from "../../../middlewares/permission.middleware.js";
 import { validateProviderVenueOwnership } from "./validateProviderVenueOwnership.middleware.js"
 
-import { updateVenue, setVenueType, setVenueFeatures, addVenuePhotos, reorderPhotos, setPricing, getVenue, getAllVenues, deleteVenue, deletePhoto } from './venue.controller.js';
+import { createFullVenue, updateVenue, setVenueType, setVenueFeatures, addVenuePhotos, reorderPhotos, setPricing, getVenue, getAllVenues, deleteVenue, deletePhoto } from './venue.controller.js';
 
 const router = express.Router();
 
 router.use(checkForAuthenticationCookie("token"));
 
+// create full venue
+router.post('/' , checkForAuthenticationCookie("token") , hasPermission("Venue" , "CREATE") , createFullVenue);
+
+// update venue
 router.put('/:venueId', hasPermission("Venue" , "UPDATE"), validateProviderVenueOwnership, updateVenue);
 
 router.put('/:venueId/type' , hasPermission("VenueType" , "UPDATE"), validateProviderVenueOwnership, setVenueType);
@@ -24,10 +28,12 @@ router.put('/:venueId/pricing', hasPermission("VenuePricingRule" , "UPDATE"), va
 
 router.get('/:venueId' , validateProviderVenueOwnership , getVenue);
 
+// get venue/venues
 router.get('/' , getAllVenues);
 
 router.delete('/:venueId', hasPermission("Venue" , "DELETE"), validateProviderVenueOwnership , deleteVenue);
 
+// delete venue
 router.delete('/:venueId/photos/:photoId', hasPermission("VenuePhoto", "DELETE") , validateProviderVenueOwnership , deletePhoto);
 
 export default router;
