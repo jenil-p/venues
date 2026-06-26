@@ -11,7 +11,7 @@ const SectionContainer = ({ title, subtitle, children }) => (
   </section>
 );
 
-const Suggestions = ({ venues, isLoading }) => {
+const Suggestions = ({ venues, wishlist, isLoading }) => {
 
   const skeletons = Array(10).fill(0);
 
@@ -37,7 +37,7 @@ const Suggestions = ({ venues, isLoading }) => {
       <SectionContainer title="Explore Venues" subtitle="Latest additions to our exclusive list">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-6 gap-y-10">
           {venues.map((venue, i) => (
-            <VenueCard key={`venue-${i}`} venue={venue} />
+            <VenueCard key={`venue-${i}`} venue={venue} wishlist={wishlist} />
           ))}
         </div>
       </SectionContainer>

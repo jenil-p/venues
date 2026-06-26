@@ -8,6 +8,7 @@ import Lenis from "lenis";
 
 const Home = () => {
   const [venues, setVenues] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Smooth Scroll Setup
@@ -23,26 +24,35 @@ const Home = () => {
 
   // Data Fetching
   useEffect(() => {
-    async function fetchVenues() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const response = await venueService.getVenues();
-        setVenues(response.data);
-        // console.log(response.data);
+
+        const venuesResponse = await venueService.getVenues();
+        setVenues(venuesResponse.data);
+
+        try {
+          const wishlistResponse = await venueService.getWishlist();
+          setWishlist(wishlistResponse.wishlists);
+        } catch (wishlistError) {
+          // user not logged in
+          setWishlist([]);
+        }
       } catch (error) {
-        console.error("Error fetching venues:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchVenues();
+
+    fetchData();
   }, []);
 
   return (
     <main className="min-h-screen flex flex-col">
       <Navbar />
 
-      <Suggestions venues={venues} isLoading={loading} />
+      <Suggestions venues={venues} wishlist={wishlist} isLoading={loading} />
 
       <FooterDiv />
     </main>

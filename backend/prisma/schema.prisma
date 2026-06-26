@@ -502,6 +502,8 @@ model Wishlist {
   user  User  @relation(fields: [userId], references: [id])
   venue Venue @relation(fields: [venueId], references: [id])
 
+  createdAt DateTime @default(now())
+
   @@unique([userId, venueId])
 }
 

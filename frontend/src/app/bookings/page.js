@@ -152,7 +152,7 @@ const MyBookingsPage = () => {
                     </div>
 
                     {/* Filter Status Pills Row */}
-                    <div className="flex flex-wrap items-center gap-2 bg-zinc-100 p-1 rounded-xl w-fit">
+                    <div className="flex flex-wrap items-center gap-2 bg-[#fdfaf5] p-1 rounded-xl w-fit">
                         {[
                             { id: 'all', label: 'All Bookings', count: stats.totalBookings },
                             { id: 'confirmed', label: 'Confirmed', count: null },
@@ -169,7 +169,7 @@ const MyBookingsPage = () => {
                                         : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
                                 }`}
                             >
-                                {tab.label} {tab.count !== null && <span className={`ml-1 px-1.5 py-0.5 text-[10px] rounded-full ${activeTab === tab.id ? 'bg-emerald-800 text-emerald-100' : 'bg-zinc-200 text-zinc-600'}`}>{tab.count}</span>}
+                                {tab.label} {tab.count !== null && <span className={`ml-1 px-1.5 py-0.5 text-[10px] rounded-full ${activeTab === tab.id ? 'bg-emerald-800 text-emerald-100' : 'bg-[#fdfaf5] text-zinc-600'}`}>{tab.count}</span>}
                             </button>
                         ))}
                     </div>
