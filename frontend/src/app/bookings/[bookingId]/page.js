@@ -193,7 +193,7 @@ const BookingDetailPage = () => {
     <div className="bg-[#FAF8F5] min-h-screen font-sans text-[#1C1917] antialiased">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-12 space-y-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-12 space-y-8 mt-20">
         
         {/* Top Minimal Action Bar */}
         <div className="flex items-center justify-between">
@@ -203,7 +203,6 @@ const BookingDetailPage = () => {
           >
             <span>&larr;</span> Back
           </button>
-          <span className="text-xs font-mono uppercase tracking-widest text-[#A8A29E]">BKG-2847-XQ</span>
         </div>
 
         {/* Global Dynamic Status State Banners */}
@@ -213,7 +212,7 @@ const BookingDetailPage = () => {
               <div className="rounded-full flex items-center justify-center text-[#6ebf8b] font-bold text-2xl"><IoCheckmarkCircleOutline/></div>
               <div>
                 <h3 className="font-semibold text-base">Booking Confirmed</h3>
-                <p className="text-xs text-zinc-300 font-mono mt-0.5">Confirmation code: MRD-7241-SF</p>
+                <p className="text-xs text-zinc-300 font-mono mt-0.5">Booking id: BKG-{booking.id}-AH</p>
               </div>
             </div>
             <button className="flex items-center gap-2 bg-[#1A3D2B] hover:bg-[#23533A] text-sm font-medium py-2 px-4 rounded-xl transition border border-[#2A6647]">

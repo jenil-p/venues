@@ -64,8 +64,8 @@ const MyBookingsPage = () => {
             setStats({
                 totalBookings: totalCount,
                 upcoming: upcomingCount,
-                venuesVisited: uniqueVenues || 3,
-                totalSpent: spentTotal || 71454
+                venuesVisited: uniqueVenues || 0,
+                totalSpent: spentTotal || 0
             });
 
             let filtered = allBookings;
@@ -221,8 +221,8 @@ const MyBookingsPage = () => {
                                             {/* Dynamic formatted timestamp row details blocks */}
                                             <div className="pt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-600 font-medium">
                                                 <span className="flex items-center gap-1"> <CiCalendar/> {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                                <span className="flex items-center gap-1"> <GoClock/> {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({durationHours || 11} hrs)</span>
-                                                <span className="flex items-center gap-1"><GoPeople/> {booking.numberOfGuestsExpected || 18} guests</span>
+                                                <span className="flex items-center gap-1"> <GoClock/> {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({durationHours || 0} hrs)</span>
+                                                <span className="flex items-center gap-1"><GoPeople/> {booking.numberOfGuestsExpected} guests</span>
                                             </div>
                                         </div>
                                     </div>
@@ -249,7 +249,7 @@ const MyBookingsPage = () => {
                                     
                                     {/* Subtle Unique Ref Code display left alignment layout item footer indicator tag */}
                                     <div className="absolute bottom-2 left-[116px] text-[10px] font-mono text-zinc-300 uppercase tracking-wider">
-                                        Ref: BKG-{booking.id || '3821'}-AH
+                                        Ref: BKG-{booking.id}-AH
                                     </div>
                                 </div>
                             );

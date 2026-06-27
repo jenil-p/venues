@@ -1,11 +1,7 @@
-import React from 'react'
+import { redirect } from "next/navigation";
 
-const page = () => {
-  return (
-    <div>
-      <h1 className='text-9xl'>This is Admin page</h1>
-    </div>
-  )
-}
+const Page = () => {
+  redirect("/admin/providers");
+};
 
-export default page
+export default Page;

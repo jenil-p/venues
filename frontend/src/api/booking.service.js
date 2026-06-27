@@ -45,5 +45,22 @@ export const bookingService = {
             razorpay_payment_id,
             razorpay_signature,
         });
+    },
+
+    // host endpoints
+    getDashboardOverview(){
+        return apiClient.get('/providers/bookings/stats')
+    },
+
+    getBookings(){
+        return apiClient.get('/providers/bookings/')
+    },
+
+    getBookingByIdForHost(bookingId){
+        return apiClient.get(`/providers/bookings/booking/${bookingId}`)
+    },
+
+    getBookigInfoOfVenueByVenueId(venueId){
+        return apiClient.get(`/providers/bookings/venue/${venueId}`)
     }
 };

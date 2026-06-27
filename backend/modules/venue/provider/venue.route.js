@@ -2,7 +2,7 @@ import express from 'express';
 
 import { checkForAuthenticationCookie } from "../../../middlewares/authentication.middleware.js";
 import { hasPermission } from "../../../middlewares/permission.middleware.js";
-import { validateProviderVenueOwnership } from "./validateProviderVenueOwnership.middleware.js"
+import { validateProviderVenueOwnership } from "../../../middlewares/validateProviderVenueOwnership.middleware.js"
 
 import { createFullVenue, updateVenue, setVenueType, setVenueFeatures, addVenuePhotos, reorderPhotos, setPricing, getVenue, getAllVenues, deleteVenue, deletePhoto } from './venue.controller.js';
 

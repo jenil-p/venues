@@ -28,7 +28,7 @@ function RemoveModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl border border-[#e1dfda] p-6 max-w-sm w-full shadow-2xl">
+      <div className="bg-[#f5f1eb] rounded-2xl border border-[#e1dfda] p-6 max-w-sm w-full shadow-2xl">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
             <Heart className="w-5 h-5 text-destructive" />
@@ -49,7 +49,7 @@ function RemoveModal({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 bg-destructive text-destructive-foreground rounded-xl py-3 text-sm font-semibold hover:bg-destructive/90"
+            className="flex-1 bg-red-400 text-white rounded-xl py-3 text-sm font-semibold hover:bg-destructive/90"
           >
             Remove
           </button>
@@ -227,7 +227,7 @@ export default function MyWishlistPage() {
                     </button>
 
                     <div className="absolute bottom-4 left-4">
-                        <span className="inline-flex items-center gap-1.5 text-xs bg-black/70 text-white px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1.5 text-xs bg-black/70 text-[#f5f1eb] px-3 py-1 rounded-full">
                         <Clock className="w-3 h-3" />
                         Saved {timeAgo(item.createdAt)}
                         </span>
@@ -301,7 +301,7 @@ export default function MyWishlistPage() {
                         <Users className="w-4 h-4" />
                         Up to {item.venue.capacity} guests
                         </div>
-                        <div className="text-sm text-emerald-600 flex items-center gap-1">
+                        <div className="text-sm text-[#1a3d2b] flex items-center gap-1">
                         View venue <ArrowRight className="w-4 h-4" />
                         </div>
                     </div>
@@ -314,16 +314,16 @@ export default function MyWishlistPage() {
             {/* Cities Section */}
             {filteredItems.length > 0 && (
             <div className="mt-12">
-                <p className="uppercase text-xs tracking-widest text-[#78716c] mb-4">Cities in your wishlist</p>
+                <p className="uppercase text-xs tracking-widest text-[#80756c] mb-4">Cities in your wishlist</p>
                 <div className="flex flex-wrap gap-3">
                 {uniqueCities.map((city) => (
                     <div
                     key={city}
-                    className="inline-flex items-center gap-2 bg-card border border-[#e1dfda] rounded-full px-4 py-2 text-sm"
+                    className="inline-flex items-center gap-2 bg-[#fdfaf5] text-[#80756c] border border-[#e1dfda] rounded-full px-4 py-2 text-sm"
                     >
                     <MapPin className="w-4 h-4" />
                     {city}
-                    <span className="font-semibold text-emerald-600">
+                    <span className="font-semibold text-[#1a3d2b]">
                         {filteredItems.filter((i) => i.venue.address.city.name === city).length}
                     </span>
                     </div>
@@ -334,18 +334,18 @@ export default function MyWishlistPage() {
 
             {/* Ready to Book Banner */}
             {items.length > 0 && (
-            <div className="mt-16 bg-emerald-950 text-white rounded-3xl p-8 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className="mt-16 bg-[#1a3d2b] text-[#f5f1eb] rounded-3xl px-8 sm:px-12 sm:py-6 flex flex-col sm:flex-row items-center justify-between gap-8">
                 <div>
                 <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <span className="uppercase tracking-widest text-xs font-medium text-emerald-400">Ready to book?</span>
+                    <CheckCircle2 className="w-5 h-5 text-[#6dbe8a]" />
+                    <span className="uppercase tracking-widest text-xs font-medium text-[#f5f1eb]">Ready to book?</span>
                 </div>
                 <h3 className="text-2xl font-semibold">You have {items.length} venue{items.length > 1 ? "s" : ""} waiting</h3>
-                <p className="text-emerald-300 mt-2">Turn a saved venue into a real experience. Check availability and lock in your date.</p>
+                <p className="text-[#f5f1eb] mt-2">Turn a saved venue into a real experience. Check availability and lock in your date.</p>
                 </div>
                 <button
                 onClick={() => router.push("/")}
-                className="shrink-0 bg-white text-emerald-950 font-semibold px-8 py-4 rounded-2xl hover:bg-white/90 transition-colors"
+                className="shrink-0 bg-[#f5f1eb] text-[#1a3d2b] font-semibold px-8 py-4 rounded-2xl hover:bg-[#f5f1eb]/90 transition-colors"
                 >
                 Browse more venues
                 </button>
