@@ -29,9 +29,9 @@ export default function HostLayout({ children }) {
     const navItems = [
         { name: "Overview", href: "/host/dashboard", icon: <MdDashboard /> },
         { name: "My Venues", href: "/host/venues", icon: <FaBuilding /> },
-        { name: "My Services", href: "/host/services", icon: <FaConciergeBell /> },
+        // { name: "My Services", href: "/host/services", icon: <FaConciergeBell /> },
         { name: "Bookings", href: "/host/bookings", icon: <FaCalendarAlt /> },
-        { name: "Insights", href: "/host/stats", icon: <FaChartPie /> },
+        // { name: "Insights", href: "/host/stats", icon: <FaChartPie /> },
     ];
 
     return (

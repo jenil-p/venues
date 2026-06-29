@@ -132,7 +132,6 @@ const ProvidersPage = () => {
                                     <th className="px-6 py-4">Applicant</th>
                                     <th className="px-6 py-4">Contact</th>
                                     <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4">Date</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -166,11 +165,6 @@ const ProvidersPage = () => {
                                             {/* Status */}
                                             <td className="px-6 py-4">
                                                 <StatusBadge status={provider.status} />
-                                            </td>
-
-                                            {/* Date (Mocked format if date not in res) */}
-                                            <td className="px-6 py-4 text-gray-500">
-                                                {new Date().toLocaleDateString()}
                                             </td>
 
                                             {/* Actions */}

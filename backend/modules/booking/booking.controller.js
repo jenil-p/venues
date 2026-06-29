@@ -38,7 +38,7 @@ export async function revertToCartController(req, res) {
     const userId = req.user.id;
 
     const result = await revertToCart({ bookingId, userId });
-    console.log(result);
+    // console.log(result);
     return res.status(200).json({ message: "Booking reverted to cart", booking: result });
   } catch (error) {
     if (error.status) return res.status(error.status).json({ message: error.message });

@@ -73,6 +73,22 @@ const BookingDetailPage = () => {
     if (bookingId) fetchData();
   }, [bookingId]);
 
+  const computeDuration = () => {
+    const start = new Date(booking.startTime);
+    const end = new Date(booking.endTime);
+
+    const ms = end - start;
+
+    const hours = ms / (1000 * 60 * 60);
+    const days = ms / (1000 * 60 * 60 * 24);
+
+    if(hours <= 24){
+      return {due: hours, hour: 1};
+    }else{
+      return {due: days, hour: 0};
+    }
+  }
+
   // Countdown timer logic
   useEffect(() => {
     if (!booking?.expiresAt || booking.bookingStatus !== 'PENDING_PAYMENT') return;
@@ -310,7 +326,7 @@ const BookingDetailPage = () => {
                 <div>
                   <p className="text-[10px] font-mono tracking-wider text-[#A8A29E] mb-1">DURATION</p>
                   <p className="text-base font-medium text-[#1C1917] flex items-center gap-2">
-                    <span className="text-lg"> <WiTime4/> </span> {booking.durationHours || 13} hours
+                    <span className="text-lg"> <WiTime4/> </span> {computeDuration().due} {(computeDuration().hour == 1)? "Hours": "Days"}
                   </p>
                 </div>
               </div>

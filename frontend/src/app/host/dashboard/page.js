@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { bookingService } from "../../../api/booking.service.js"
+import { getAllVenues, providerService } from "../../../api/provider.service.js"
 import toast from "react-hot-toast";
 import { FaWallet, FaCalendarCheck, FaBuilding, FaStar } from "react-icons/fa";
 
@@ -25,12 +26,16 @@ const HostDashboard = () => {
     const router = useRouter();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [venues, setVenues] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const res = await bookingService.getDashboardOverview();
+                const venues = await providerService.getAllVenues();
+                console.log(res);
                 setData(res);
+                setVenues(venues);
             } catch (err) {
                 toast.error("Failed to load dashboard");
             } finally {
@@ -77,10 +82,9 @@ const HostDashboard = () => {
                             <h2 className="font-bold text-xl">Revenue Trend</h2>
                             <p className="text-sm text-gray-500">Monthly earnings • 2025</p>
                         </div>
-                        <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Live</div>
                     </div>
-                    {/* Replace with your chart library (Recharts / Chart.js) */}
-                    <div className="h-80 bg-gray-50 rounded-xl flex items-center justify-center border border-dashed">Revenue Trend Chart</div>
+                    {/* Yet to come ... */}
+                    <div className="h-80 bg-gray-50 rounded-xl flex items-center justify-center border border-dashed">Revenue Trend Chart (Coming soon... ) </div>
                 </div>
 
                 {/* Upcoming */}
@@ -139,15 +143,16 @@ const HostDashboard = () => {
                         <h3 className="font-bold">My Venues</h3>
                         <button onClick={() => router.push('/host/venues')} className="text-rose-600 text-sm hover:underline">Manage →</button>
                     </div>
-                    {data?.venues?.slice(0,3).map(v => (
+                    {venues.venues?.slice(0,3).map(v => (
                         <div key={v.id} className="flex gap-4 py-4 border-b last:border-0">
                             <img src={v.photos?.[0]?.image} className="w-16 h-16 object-cover rounded-lg" alt=""/>
                             <div className="flex-1">
                                 <p className="font-medium">{v.venuename}</p>
-                                <p className="text-sm text-gray-500">{v.address?.city?.name}</p>
+                                <p className="text-sm text-gray-500">{v.address.location}, {v.address.city.name}</p>
+                                <p className="text-sm text-gray-500">{v.capacity} Guests</p>
                             </div>
                             <div>
-                                <p className="font-bold text-right">₹{Number(v.revenue || 0).toLocaleString()}</p>
+                                <p className="text-right">{v.status}</p>
                             </div>
                         </div>
                     ))}
