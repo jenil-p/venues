@@ -1,11 +1,8 @@
 import React from 'react'
+import { redirect } from 'next/navigation'
 
 const page = () => {
-  return (
-    <div className='bg-black w-full h-full text-white text-8xl'>
-      Empty Chick
-    </div>
-  )
+  redirect("/");
 }
 
 export default page
