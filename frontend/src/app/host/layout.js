@@ -4,8 +4,17 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { providerService } from "@/api/provider.service";
-import { FaHome, FaBuilding, FaConciergeBell, FaCalendarAlt, FaChartPie, FaPlus } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
+import {
+    LuArrowUpRight,
+    LuBuilding2,
+    LuCalendarDays,
+    LuLayoutDashboard,
+    LuMenu,
+    LuSparkles,
+    LuWrench,
+} from "react-icons/lu";
+import { FaRegChartBar } from "react-icons/fa";
+
 
 export default function HostLayout({ children }) {
     const { authStatus, user } = useAuth();
@@ -27,33 +36,48 @@ export default function HostLayout({ children }) {
     }, [authStatus, router]);
 
     const navItems = [
-        { name: "Overview", href: "/host/dashboard", icon: <MdDashboard /> },
-        { name: "My Venues", href: "/host/venues", icon: <FaBuilding /> },
-        // { name: "My Services", href: "/host/services", icon: <FaConciergeBell /> },
-        { name: "Bookings", href: "/host/bookings", icon: <FaCalendarAlt /> },
-        // { name: "Insights", href: "/host/stats", icon: <FaChartPie /> },
+        { name: "Overview", href: "/host/dashboard", icon: <LuLayoutDashboard /> },
+        { name: "My Venues", href: "/host/venues", icon: <LuBuilding2 /> },
+        { name: "My Services", href: "/host/services", icon: <LuWrench />, badge: "Soon" },
+        { name: "Bookings", href: "/host/bookings", icon: <LuCalendarDays />, badge: "2", notification: true },
+        { name: "Insights", href: "/host/insights", icon: <FaRegChartBar /> },
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans">
-            <aside className="w-full md:w-64 bg-white border-r border-gray-200 md:h-screen md:fixed z-40 flex flex-col justify-between">
+        <div className="min-h-screen bg-[#f8f6f2] flex flex-col md:flex-row font-sans">
+            <aside className="w-full md:w-[250px] bg-[#1a3d2b] text-[#88978b] md:h-screen md:fixed z-40 flex flex-col justify-between">
                 <div>
-                    <div className="p-6 border-b border-gray-100 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-rose-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">H</div>
-                        <h2 className="text-xl font-bold text-gray-800">Host<span className="text-rose-500">Panel</span></h2>
+                    <div className="h-[94px] px-6 border-b border-white/10 flex items-center justify-between">
+                        <Link href="/host/dashboard" className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-[#315c49] flex items-center justify-center">
+                                <LuBuilding2 className="text-xl text-[#f7f6f1]" />
+                            </div>
+                            <h2 className="font-serif text-lg font-semibold tracking-[-0.03em] text-[#f8f6f1]">
+                                Host<span className="text-[#e3572d]">Panel</span>
+                            </h2>
+                        </Link>
                     </div>
 
-                    <nav className="p-4 space-y-1">
+                    <nav className="px-3 py-5 space-y-1.5">
                         {navItems.map((item) => {
                             const isActive = pathname === item.href;
                             return (
                                 <Link key={item.href} href={item.href}>
-                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                                        ? "bg-rose-50 text-rose-600 shadow-sm border border-rose-100"
-                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                    <div className={`flex mb-1 min-h-[40px] items-center gap-4 px-5 rounded-lg text-sm font-semibold transition-colors duration-200 ${isActive
+                                        ? "bg-[#3c6754] text-[#fbfaf7]"
+                                        : "text-[#a2b4ab] hover:bg-[#244e3a] hover:text-[#f8f6f1]"
                                         }`}>
-                                        <span className="text-lg">{item.icon}</span>
-                                        {item.name}
+                                        <span className="text-md leading-none">{item.icon}</span>
+                                        <span>{item.name}</span>
+                                        {item.badge && (
+                                            <span className={`ml-auto inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold ${item.notification
+                                                ? "min-w-7 bg-[#ffbe0b] text-[#26402f]"
+                                                : "bg-[#665126] text-[#f7f0df]"
+                                                }`}>
+                                                {item.badge === "Soon" && <LuSparkles className="mr-1 text-[11px]" />}
+                                                {item.badge}
+                                            </span>
+                                        )}
                                     </div>
                                 </Link>
                             );
@@ -61,16 +85,16 @@ export default function HostLayout({ children }) {
                     </nav>
                 </div>
 
-                <div className="p-4 border-t border-gray-100">
+                <div className="px-2 py-2 border-t border-white/10">
                     <Link href="/">
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all">
-                            <FaHome className="text-lg" /> Back to Home
+                        <div className="flex min-h-[40px] items-center gap-4 px-5 rounded-lg text-[18px] font-semibold text-[#88978b] hover:bg-[#244e3a] hover:text-[#f8f6f1] transition-colors">
+                            <LuArrowUpRight className="text-[23px]" /> Back to Home
                         </div>
                     </Link>
                 </div>
             </aside>
 
-            <main className="flex-1 md:ml-64 p-4 md:p-8 pt-24 md:pt-8 overflow-y-auto">
+            <main className="flex-1 md:ml-[250px] p-4 md:p-8 pt-24 md:pt-8 overflow-y-auto">
                 {children}
             </main>
         </div>

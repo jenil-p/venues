@@ -48,10 +48,6 @@ export const bookingService = {
     },
 
     // host endpoints
-    getDashboardOverview(){
-        return apiClient.get('/providers/bookings/stats')
-    },
-
     getBookings(){
         return apiClient.get('/providers/bookings/')
     },
@@ -62,5 +58,13 @@ export const bookingService = {
 
     getBookigInfoOfVenueByVenueId(venueId){
         return apiClient.get(`/providers/bookings/venue/${venueId}`)
+    },
+
+    getDashboardOverview(){
+        return apiClient.get('/providers/bookings/dashboard-overview')
+    },
+
+    getInsights(){
+        return apiClient.get('providers/bookings/insights')
     }
 };

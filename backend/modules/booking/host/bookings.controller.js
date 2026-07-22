@@ -1,4 +1,4 @@
-import { getHostBookings, getHostBookingById, getHostBookingsStats, getProviderId } from './bookings.service.js';
+import { getHostBookings, getHostBookingById, getHostBookingsStats, getProviderId,getDashboardOverview, getInsights } from './bookings.service.js';
 
 export async function getHostBookingsController(req, res) {
     try {
@@ -60,6 +60,32 @@ export async function getHostBookingsStatsController(req, res) {
     } catch (error) {
         if (error.status) return res.status(error.status).json({ message: error.message });
         console.error("getHostBookingsStats error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function getDashboardOverviewController(req, res) {
+    try {
+        const userId = Number(req.user.id);
+        const providerId = await getProviderId(userId);
+        const result = await getDashboardOverview(providerId);
+        return res.status(200).json(result);
+    } catch (error) {
+        if (error.status) return res.status(error.status).json({ message: error.message });
+        console.error("getDashboardOverview error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function getInsightsController(req, res) {
+    try {
+        const userId = Number(req.user.id);
+        const providerId = await getProviderId(userId);
+        const result = await getInsights(providerId);
+        return res.status(200).json(result);
+    } catch (error) {
+        if (error.status) return res.status(error.status).json({ message: error.message });
+        console.error("getInsights error:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
