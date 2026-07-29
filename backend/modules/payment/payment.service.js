@@ -1,6 +1,8 @@
 import prisma from '../../prisma/client.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import { enqueuePaymentJob } from '../../queues/payment.queue.js';
+import { enqueueNotification } from '../../queues/notification.queue.js';
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -136,6 +138,11 @@ export async function verifyPaymentSignature({ razorpay_order_id, razorpay_payme
         throw err;
     }
 
+    // Idempotency check: if webhook worker already processed this, skip
+    if (payment.status === 'SUCCESS') {
+        return { success: true, bookingId: payment.bookingId };
+    }
+
     await prisma.$transaction([
         prisma.payment.update({
             where: { id: payment.id },
@@ -150,10 +157,65 @@ export async function verifyPaymentSignature({ razorpay_order_id, razorpay_payme
         }),
     ]);
 
+    // Best-effort notifications — must not break the success response
+    try {
+        const booking = await prisma.booking.findUnique({
+            where: { id: payment.bookingId },
+            include: {
+                venue: { select: { venuename: true, providerId: true } },
+                user: { select: { fullname: true, email: true } },
+            },
+        });
+
+        if (booking?.user?.email) {
+            await enqueueNotification({
+                type: "booking_confirmed_user",
+                data: {
+                    email: booking.user.email,
+                    userName: booking.user.fullname,
+                    venueName: booking.venue.venuename,
+                    startTime: booking.startTime,
+                    endTime: booking.endTime,
+                    totalCost: payment.amount,
+                    bookingId: payment.bookingId,
+                },
+            });
+        }
+
+        if (booking?.venue?.providerId) {
+            const hostProfile = await prisma.providerProfile.findUnique({
+                where: { id: booking.venue.providerId },
+                include: { user: { select: { fullname: true, email: true } } },
+            });
+            if (hostProfile?.user?.email) {
+                await enqueueNotification({
+                    type: "booking_confirmed_host",
+                    data: {
+                        email: hostProfile.user.email,
+                        hostName: hostProfile.user.fullname,
+                        userName: booking.user.fullname,
+                        venueName: booking.venue.venuename,
+                        startTime: booking.startTime,
+                        endTime: booking.endTime,
+                        totalCost: payment.amount,
+                        bookingId: payment.bookingId,
+                    },
+                });
+            }
+        }
+    } catch (notifErr) {
+        console.warn("[payment] failed to enqueue confirmation notifications:", notifErr.message);
+    }
+
     return { success: true, bookingId: payment.bookingId };
 }
 
-// Webhook handler
+/**
+ * Webhook handler — verifies the Razorpay signature, enqueues a
+ * payment-processing job, and returns 200 immediately so Razorpay
+ * doesn't retry. The actual payment processing happens asynchronously
+ * in the BullMQ worker.
+ */
 export async function handleRazorpayWebhook(payload, signature) {
     const isValid = Razorpay.validateWebhookSignature(
         JSON.stringify(payload),
@@ -170,46 +232,17 @@ export async function handleRazorpayWebhook(payload, signature) {
     const event = payload.event;
     const paymentEntity = payload.payload.payment?.entity;
 
-    if (event === 'payment.captured' && paymentEntity) {
-        await handleSuccessfulPayment(paymentEntity.order_id);
-    } else if (event === 'payment.failed' && paymentEntity) {
-        await handleFailedPayment(paymentEntity.order_id);
+    if (!paymentEntity) {
+        console.warn("[webhook] received event without payment entity:", event);
+        return;
     }
-}
 
-async function handleSuccessfulPayment(orderId) {
-    const payment = await prisma.payment.findUnique({
-        where: { transactionId: orderId },
+    // Enqueue the job for async processing
+    const jobId = await enqueuePaymentJob({
+        orderId: paymentEntity.order_id,
+        paymentId: paymentEntity.id,
+        event,
     });
 
-    if (!payment) return;
-
-    await prisma.$transaction([
-        prisma.payment.update({
-            where: { id: payment.id },
-            data: { status: 'SUCCESS' },
-        }),
-        prisma.booking.update({
-            where: { id: payment.bookingId },
-            data: {
-                bookingStatus: 'CONFIRMED',
-                expiresAt: null,
-            },
-        }),
-    ]);
-}
-
-async function handleFailedPayment(orderId) {
-    const payment = await prisma.payment.findUnique({
-        where: { transactionId: orderId },
-    });
-
-    if (payment) {
-        await prisma.payment.update({
-            where: { id: payment.id },
-            data: { status: 'FAILED' },
-        });
-
-        // can make the booking again "CART" here ... think abt it
-    }
+    console.log(`[webhook] enqueued payment job ${jobId} for order ${paymentEntity.order_id} (${event})`);
 }

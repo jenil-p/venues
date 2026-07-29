@@ -1,5 +1,6 @@
 import prisma from '../../prisma/client.js';
 import { isSlotAvailable } from './availability/availability.service.js';
+import { enqueueNotification } from '../../queues/notification.queue.js';
 
 // this function is for internal use (not to get exported :)
 function calculateTotalCost(pricingRules, startTime, endTime) {
@@ -118,13 +119,37 @@ export async function cancelBooking({ bookingId, userId }) {
         throw err;
     }
 
-    return prisma.booking.update({
+    const cancelled = await prisma.booking.update({
         where: { id: bookingId },
         data: { 
             bookingStatus: 'CANCELLED', 
             expiresAt: null 
         },
+        include: {
+            venue: { select: { venuename: true } },
+            user: { select: { fullname: true, email: true } },
+        },
     });
+
+    // Best-effort notify user about cancellation — must not break the cancel flow
+    try {
+        if (cancelled.user?.email) {
+            await enqueueNotification({
+                type: "booking_cancelled_user",
+                data: {
+                    email: cancelled.user.email,
+                    userName: cancelled.user.fullname,
+                    venueName: cancelled.venue.venuename,
+                    startTime: cancelled.startTime,
+                    bookingId: cancelled.id,
+                },
+            });
+        }
+    } catch (notifErr) {
+        console.warn("[cancel] failed to enqueue cancellation notification:", notifErr.message);
+    }
+
+    return cancelled;
 }
 
 export async function revertToCart({ bookingId, userId }) {
